@@ -1,5 +1,17 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyARHithRPMeScrInNAyT-JNIOAklJ2lJrI",
+  authDomain: "whatistheprompt-f21ee.firebaseapp.com",
+  projectId: "whatistheprompt-f21ee",
+  storageBucket: "whatistheprompt-f21ee.firebasestorage.app",
+  messagingSenderId: "118376175287",
+  appId: "1:118376175287:web:47e0be6732b3a775821f32"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 document.addEventListener('DOMContentLoaded', () => {
     // Note: This script runs on both index.html and generate.html.
     // Some elements only exist on generate.html, so we check for their existence.
