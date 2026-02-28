@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultText.value = generatedPrompt;
         } catch (error) {
             console.error("Error during generation", error);
-            alert("Generation failed, please try again.");
+            alert("Generation failed: " + error.message);
         } finally {
             // Reset UI
             loadingMsg.style.display = 'none';
@@ -349,7 +349,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!response.ok) {
-            throw new Error(`Worker API Error: ${response.status}`);
+            let errorText = await response.text();
+            try {
+                const json = JSON.parse(errorText);
+                errorText = json.error || errorText;
+            } catch (e) {
+                // If it's not JSON, keep raw text
+            }
+            throw new Error(`Worker returned ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
