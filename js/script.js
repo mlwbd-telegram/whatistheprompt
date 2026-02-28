@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append("image", imageFile);
 
-        const response = await fetch('/api', {
+        const response = await fetch('https://prompt-api.abusaifeshovon.workers.dev', {
             method: 'POST',
             body: formData
         });
