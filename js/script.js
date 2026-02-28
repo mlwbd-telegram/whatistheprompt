@@ -196,19 +196,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. BACKEND API PLACEHOLDER
     // ---------------------------------------------------------
     async function callBackendAPI(imageFile) {
-        // TODO: Replace this simulated delay with real fetch() to Cloudflare Worker.
-        // Example:
-        // const formData = new FormData();
-        // formData.append('image', imageFile);
-        // const response = await fetch('YOUR_CLOUDFLARE_WORKER_URL_HERE', { method: 'POST', body: formData });
-        // const data = await response.json();
-        // return data.promptText;
+        // Note: The Cloudflare Worker expects a JSON body with { "prompt": "text..." }.
+        // If you plan to analyze the uploaded 'imageFile', you'll need to do that step
+        // (e.g., using a Vision API or extracting metadata) before this API call.
+        //
+        // For now, this is testing the connection to your live API with a dummy image description:
+        const extractedTextDescription = "A young woman wearing a red jacket standing in the rain at night";
 
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve("A highly detailed cinematic shot of a breathtaking landscape...");
-            }, 3000); // 3 seconds mock processing time
+        const response = await fetch('https://prompt-api.abusaifeshovon.workers.dev', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: extractedTextDescription })
         });
+
+        if (!response.ok) {
+            throw new Error(`Worker API Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.result;
     }
 
     // ---------------------------------------------------------
