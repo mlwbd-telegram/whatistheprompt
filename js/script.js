@@ -1,3 +1,5 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 document.addEventListener('DOMContentLoaded', () => {
     // Note: This script runs on both index.html and generate.html.
     // Some elements only exist on generate.html, so we check for their existence.
