@@ -1,6 +1,6 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,6 +15,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,18 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearBtn = document.getElementById('clear-btn');
     const copySuccess = document.getElementById('copy-success');
 
+    // --- AD MODAL ELEMENTS ---
+    const adModal = document.getElementById('ad-modal');
+    const adCountdown = document.getElementById('ad-countdown');
+    const closeAdBtn = document.getElementById('close-ad-btn');
+
     // ---------------------------------------------------------
     // 1. FILE UPLOAD LOGIC
     // ---------------------------------------------------------
     let currentImageFile = null;
 
     if (dropZone && fileInput && browseBtn) {
-        // Trigger file input when "Choose file" is clicked
         browseBtn.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // Handle drag and drop styling
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('dragover');
@@ -66,18 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
-
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                const file = e.dataTransfer.files[0];
-                handleFileSelect(file);
+                handleFileSelect(e.dataTransfer.files[0]);
             }
         });
 
-        // Handle file selection from input
         fileInput.addEventListener('change', (e) => {
             if (e.target.files && e.target.files.length > 0) {
-                const file = e.target.files[0];
-                handleFileSelect(file);
+                handleFileSelect(e.target.files[0]);
             }
         });
 
@@ -91,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleFileSelect(file) {
-        // Only accept images
         if (!file.type.match('image.*')) {
             alert('Please select an image file (JPG or PNG).');
             return;
@@ -112,16 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---------------------------------------------------------
     let isLoggedIn = false;
 
-    // Listen to Auth State Changes natively
     onAuthStateChanged(auth, (user) => {
         if (user) {
             isLoggedIn = true;
-
             if (headerLoginBtn) {
-                // Keep the icon slightly, or just text
                 headerLoginBtn.innerHTML = 'Sign Out';
             }
-
             if (mainLoginBtn) {
                 mainLoginBtn.style.display = 'none';
                 if (loginWarningMsg) {
@@ -129,13 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     loginWarningMsg.textContent = `Logged in successfully as ${user.displayName || 'User'}! You can now generate a prompt.`;
                 }
             }
-
             if (generateBtn) {
                 generateBtn.disabled = false;
             }
         } else {
             isLoggedIn = false;
-
             if (headerLoginBtn) {
                 headerLoginBtn.innerHTML = `
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -144,9 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
-                Sign in with Google`;
+                Sign in`;
             }
-
             if (mainLoginBtn) {
                 mainLoginBtn.style.display = 'inline-flex';
                 if (loginWarningMsg) {
@@ -154,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     loginWarningMsg.textContent = 'Login required before generating.';
                 }
             }
-
             if (generateBtn) {
                 generateBtn.disabled = true;
             }
@@ -193,22 +184,168 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 3. BACKEND API CALL (Points to your new Cloudflare Worker)
+    // 3. QUOTA AND ADBLOCK LOGIC
     // ---------------------------------------------------------
-    async function callBackendAPI(imageFile) {
-        // Note: The Cloudflare Worker expects a JSON body with { "prompt": "text..." }.
-        // If you plan to analyze the uploaded 'imageFile', you'll need to do that step
-        // (e.g., using a Vision API or extracting metadata) before this API call.
-        //
-        // For now, this is testing the connection to your live API with a dummy image description:
-        const extractedTextDescription = "A young woman wearing a red jacket standing in the rain at night"; 
+    async function checkAndConsumeQuota(user) {
+        const userRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userRef);
 
-        const response = await fetch('https://prompt-api.abusaifeshovon.workers.dev', {
+        // Get today's local date string
+        const today = new Date().toLocaleDateString();
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+
+            if (data.lastReset !== today) {
+                // Reset for a new day
+                await setDoc(userRef, { dailyCount: 1, lastReset: today }, { merge: true });
+                return true;
+            } else {
+                if (data.dailyCount >= 5) {
+                    return false; // Limit reached
+                } else {
+                    await setDoc(userRef, { dailyCount: data.dailyCount + 1 }, { merge: true });
+                    return true;
+                }
+            }
+        } else {
+            // First time user
+            await setDoc(userRef, { dailyCount: 1, lastReset: today });
+            return true;
+        }
+    }
+
+    async function detectAdBlock() {
+        let isBlocked = false;
+
+        // Create a bait element
+        const bait = document.createElement('div');
+        bait.innerHTML = '&nbsp;';
+        bait.className = 'adsbox ad-banner ad-container';
+        bait.style.position = 'absolute';
+        bait.style.top = '-999px';
+        document.body.appendChild(bait);
+
+        // Wait a tiny bit
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (bait.offsetHeight === 0 || window.getComputedStyle(bait).display === 'none') {
+            isBlocked = true;
+        }
+        bait.remove();
+
+        return isBlocked;
+    }
+
+    // ---------------------------------------------------------
+    // 4. GENERATE BUTTON LOGIC & AD MODAL
+    // ---------------------------------------------------------
+    let adTimerInterval;
+
+    if (generateBtn) {
+        generateBtn.addEventListener('click', async () => {
+            if (!isLoggedIn) {
+                alert('Please sign in first.');
+                return;
+            }
+
+            if (!currentImageFile) {
+                alert('Please upload an image first.');
+                return;
+            }
+
+            const currentUser = auth.currentUser;
+            if (!currentUser) return;
+
+            // Disable button to prevent spam clicks
+            generateBtn.disabled = true;
+
+            // Check AdBlock
+            const adBlocked = await detectAdBlock();
+            if (adBlocked) {
+                alert("Ad blocker detected. Please disable your ad blocker to use this tool.");
+                generateBtn.textContent = 'Ad Blocker Detected';
+                return; // Leave disabled
+            }
+
+            // Check Quota
+            try {
+                const hasQuota = await checkAndConsumeQuota(currentUser);
+                if (!hasQuota) {
+                    alert("Daily limit reached (5/5). Please come back tomorrow.");
+                    generateBtn.disabled = false;
+                    return;
+                }
+            } catch (error) {
+                console.error("Error checking quota:", error);
+                alert("Failed to verify generation limits. Please try again.");
+                generateBtn.disabled = false;
+                return;
+            }
+
+            // Show Ad Modal Overlay
+            adModal.style.display = 'flex';
+            closeAdBtn.style.display = 'none';
+            let timeLeft = 20;
+            adCountdown.textContent = timeLeft;
+
+            adTimerInterval = setInterval(() => {
+                timeLeft--;
+                adCountdown.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(adTimerInterval);
+                    closeAdBtn.style.display = 'block';
+                }
+            }, 1000);
+
+            // Trigger Vignette Ad if they want it on top of the modal
+            (function (s) {
+                s.dataset.zone = '10664014';
+                s.src = 'https://gizokraijaw.net/vignette.min.js';
+                [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
+            })(document.createElement('script'));
+        });
+    }
+
+    if (closeAdBtn) {
+        closeAdBtn.addEventListener('click', async () => {
+            adModal.style.display = 'none';
+            await executeGeneration();
+        });
+    }
+
+    // ---------------------------------------------------------
+    // 5. BACKEND API CALL
+    // ---------------------------------------------------------
+    async function executeGeneration() {
+        // Set UI to loading state
+        generateBtn.disabled = true;
+        generateBtn.textContent = 'Generating...';
+        loadingMsg.style.display = 'block';
+        resultText.value = '';
+
+        try {
+            // Call API
+            const generatedPrompt = await callBackendAPI(currentImageFile);
+            resultText.value = generatedPrompt;
+        } catch (error) {
+            console.error("Error during generation", error);
+            alert("Generation failed, please try again.");
+        } finally {
+            // Reset UI
+            loadingMsg.style.display = 'none';
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate Prompt';
+        }
+    }
+
+    async function callBackendAPI(imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+
+        const response = await fetch('/api', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: extractedTextDescription })
+            body: formData
         });
 
         if (!response.ok) {
@@ -220,53 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 4. GENERATE BUTTON LOGIC & MONETAG AD
-    // ---------------------------------------------------------
-    if (generateBtn) {
-        generateBtn.addEventListener('click', async () => {
-            // Guard clauses
-            if (!isLoggedIn) {
-                alert('Please sign in first.');
-                return;
-            }
-
-            if (!currentImageFile) {
-                alert('Please upload an image first.');
-                return;
-            }
-
-            // Fire Monetag Vignette Ad Script as requested
-            // Note: Vignette usually overlays the screen and waits for user interaction
-            (function (s) {
-                s.dataset.zone = '10664014';
-                s.src = 'https://gizokraijaw.net/vignette.min.js';
-                [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
-            })(document.createElement('script'));
-
-            // Set UI to loading state
-            generateBtn.disabled = true;
-            generateBtn.textContent = 'Generating...';
-            loadingMsg.style.display = 'block';
-            resultText.value = '';
-
-            try {
-                // Call real Cloudflare API
-                const generatedPrompt = await callBackendAPI(currentImageFile);
-                resultText.value = generatedPrompt;
-            } catch (error) {
-                console.error("Error during generation", error);
-                alert("Generation failed, please try again.");
-            } finally {
-                // Reset UI
-                loadingMsg.style.display = 'none';
-                generateBtn.disabled = false;
-                generateBtn.textContent = 'Generate Prompt';
-            }
-        });
-    }
-
-    // ---------------------------------------------------------
-    // 5. RESULT ACTIONS (COPY / CLEAR)
+    // 6. RESULT ACTIONS (COPY / CLEAR)
     // ---------------------------------------------------------
     if (copyBtn && resultText) {
         copyBtn.addEventListener('click', () => {
