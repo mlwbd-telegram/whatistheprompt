@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 3. BACKEND API PLACEHOLDER
+    // 3. BACKEND API CALL (Points to your new Cloudflare Worker)
     // ---------------------------------------------------------
     async function callBackendAPI(imageFile) {
         // Note: The Cloudflare Worker expects a JSON body with { "prompt": "text..." }.
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // (e.g., using a Vision API or extracting metadata) before this API call.
         //
         // For now, this is testing the connection to your live API with a dummy image description:
-        const extractedTextDescription = "A young woman wearing a red jacket standing in the rain at night";
+        const extractedTextDescription = "A young woman wearing a red jacket standing in the rain at night"; 
 
         const response = await fetch('https://prompt-api.abusaifeshovon.workers.dev', {
             method: 'POST',
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultText.value = '';
 
             try {
-                // Call placeholder API function
+                // Call real Cloudflare API
                 const generatedPrompt = await callBackendAPI(currentImageFile);
                 resultText.value = generatedPrompt;
             } catch (error) {
