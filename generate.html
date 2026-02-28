@@ -169,6 +169,34 @@
         <script src="https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js"></script>
     </div>
 
+    <!-- AD MODAL (Ad Gated Generation) -->
+    <div class="ad-modal-overlay" id="ad-modal" style="display: none;">
+        <div class="ad-modal-content">
+            <h3>Please watch this ad to unlock prompt generation</h3>
+
+            <div class="ad-modal-banner" id="modal-ad-container">
+                <div style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 0.5rem;">Ad Space</div>
+                <script>
+                    atOptions = {
+                        'key': 'e1d24c3cd11f87e62d2147e4f6ea76fa',
+                        'format': 'iframe',
+                        'height': 250,
+                        'width': 300,
+                        'params': {}
+                    };
+                </script>
+                <script src="https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js"></script>
+            </div>
+
+            <div class="ad-timer">
+                <span id="ad-countdown">20</span> seconds remaining...
+            </div>
+
+            <button class="btn-primary" id="close-ad-btn" style="display: none; width: 100%;">Close Ad &
+                Generate</button>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script type="module" src="js/script.js"></script>
 </body>
