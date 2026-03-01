@@ -116,6 +116,15 @@
                     style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">03</span>
                 Generate
             </h2>
+
+            <!-- Usage Counter Panel -->
+            <div class="usage-counter" id="usage-counter">
+                <div class="usage-counter-bar">
+                    <div class="usage-counter-fill" id="usage-counter-fill" style="width: 0%;"></div>
+                </div>
+                <p class="usage-counter-text" id="usage-counter-text">Free Generations: 0 / 5 used today</p>
+            </div>
+
             <button class="btn-primary" id="generate-btn" disabled
                 style="width: 100%; justify-content: center; padding: 1rem;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -124,8 +133,12 @@
                 </svg>
                 Generate Prompt
             </button>
-            <!-- Adblock warning — shown by script.js if Monetag script fails to load -->
+            <!-- Adblock warning — shown by script.js if Adsterra script fails to load -->
             <p id="adblock-warning-msg"
+                style="display:none; color:#f87171; font-size:0.85rem; margin-top:0.75rem; text-align:center; font-weight:500;">
+            </p>
+            <!-- Daily limit reached warning -->
+            <p id="limit-warning-msg"
                 style="display:none; color:#f87171; font-size:0.85rem; margin-top:0.75rem; text-align:center; font-weight:500;">
             </p>
             <p class="loading-text" id="loading-msg">⚡ Analyzing image with Llama 4 Vision...</p>
@@ -179,9 +192,15 @@
         </div>
     </footer>
 
-    <!-- STICKY AD -->
+    <!-- RIGHT STICKY AD -->
     <div class="ad-sticky" id="sticky-ad-container">
         <div class="ad-label">Ad Space (300x250)</div>
+        <script>atOptions = { 'key': 'e1d24c3cd11f87e62d2147e4f6ea76fa', 'format': 'iframe', 'height': 250, 'width': 300, 'params': {} };</script>
+        <script src="https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js"></script>
+    </div>
+
+    <!-- LEFT STICKY AD (mirrors the right-side box) -->
+    <div class="ad-sticky-left" id="left-sticky-ad">
         <script>atOptions = { 'key': 'e1d24c3cd11f87e62d2147e4f6ea76fa', 'format': 'iframe', 'height': 250, 'width': 300, 'params': {} };</script>
         <script src="https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js"></script>
     </div>
@@ -206,7 +225,7 @@
                     ad…</span>
             </div>
 
-            <div class="ad-timer" id="ad-countdown">20</div>
+            <div class="ad-timer" id="ad-countdown">10</div>
             <div class="ad-timer-label" id="ad-timer-label">seconds remaining</div>
             <button class="btn-primary" id="close-ad-btn" style="display: none; width: 100%; justify-content: center;"
                 aria-label="Close ad and generate prompt">
