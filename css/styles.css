@@ -429,9 +429,8 @@ body::after {
 /* Left-side sticky sidebar ad (mirrors right-side) */
 .ad-sticky-left {
   position: fixed;
-  top: 50%;
+  bottom: 20px;
   left: 20px;
-  transform: translateY(-50%);
   width: 300px;
   height: 250px;
   background: var(--bg-card);
