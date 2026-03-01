@@ -426,8 +426,30 @@ body::after {
   font-size: 0.75rem;
 }
 
+/* Left-side sticky sidebar ad (mirrors right-side) */
+.ad-sticky-left {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  width: 300px;
+  height: 250px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 50;
+  overflow: hidden;
+}
+
 @media (max-width: 1024px) {
-  .ad-sticky {
+
+  .ad-sticky,
+  .ad-sticky-left {
     display: none;
   }
 }
