@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const adModal = document.getElementById('ad-modal');
     const adCountdown = document.getElementById('ad-countdown');
     const adTimerLabel = document.getElementById('ad-timer-label');
-    const monetagAdSlot = document.getElementById('monetag-ad-slot');
+    const modalAdSlot = document.getElementById('modal-ad-slot');
     const closeAdBtn = document.getElementById('close-ad-btn');
     const adBlockWarning = document.getElementById('adblock-warning-msg');
 
@@ -219,42 +219,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 4. ADBLOCK DETECTION (via Monetag script load attempt)
+    // 4. ADBLOCK DETECTION (via Adsterra script load attempt)
     //
-    //    We try to load the real Monetag script into the modal slot.
+    //    We inject the real Adsterra invoke.js into the modal slot.
     //    If the script fires its onload → ad network is reachable → no adblock.
-    //    If the script fires its onerror → blocked  → disable the button.
+    //    If the script fires its onerror → blocked → disable the button.
     //
-    //    ╔══════════════════════════════════════════════════════════╗
-    //    ║  MONETAG_SCRIPT_SRC — PASTE YOUR MONETAG ZONE URL HERE  ║
-    //    ║  Replace the placeholder URL below with the src value   ║
-    //    ║  from your Monetag dashboard (Zone → Get Tag → src=…)   ║
-    //    ╚══════════════════════════════════════════════════════════╝
-    const MONETAG_SCRIPT_SRC = 'https://gizokraijaw.net/vignette.min.js'; // ← REPLACE WITH YOUR MONETAG SCRIPT URL
-    const MONETAG_ZONE_ID = '10664014';                                  // ← REPLACE WITH YOUR MONETAG ZONE ID (if needed by the script)
+    //    ╔═══════════════════════════════════════════════════════════╗
+    //    ║  ADSTERRA CONFIG — Update the key below if zone changes  ║
+    //    ╚═══════════════════════════════════════════════════════════╝
+    const ADSTERRA_KEY = 'e1d24c3cd11f87e62d2147e4f6ea76fa';
+    const ADSTERRA_SCRIPT_SRC = `https://www.highperformanceformat.com/${ADSTERRA_KEY}/invoke.js`;
 
     /**
-     * Injects the Monetag script into #monetag-ad-slot and returns a Promise
+     * Injects the Adsterra 300×250 ad into #modal-ad-slot and returns a Promise
      * that resolves with true (loaded OK) or false (blocked / error).
-     * The script is created fresh each call so the ad re-fires correctly.
+     * The script is created fresh each call so the ad re-renders correctly.
      */
-    function loadMonetagAd() {
+    function loadAdsterraAd() {
         return new Promise((resolve) => {
-            // Clear any previous content
-            if (monetagAdSlot) {
-                monetagAdSlot.innerHTML = '';
+            // Clear any previous ad content
+            if (modalAdSlot) {
+                modalAdSlot.innerHTML = '';
             }
 
+            // Set global atOptions BEFORE injecting invoke.js (Adsterra reads this)
+            window.atOptions = {
+                'key': ADSTERRA_KEY,
+                'format': 'iframe',
+                'height': 250,
+                'width': 300,
+                'params': {}
+            };
+
             const s = document.createElement('script');
-            s.src = MONETAG_SCRIPT_SRC;
-            if (MONETAG_ZONE_ID) s.dataset.zone = MONETAG_ZONE_ID;
+            s.src = ADSTERRA_SCRIPT_SRC;
             s.async = true;
 
             // Resolved by whichever fires first
             const timeout = setTimeout(() => {
-                // Treat silence after 3 s as blocked (conservative)
+                // Treat silence after 4s as blocked (conservative)
                 resolve(false);
-            }, 3000);
+            }, 4000);
 
             s.onload = () => {
                 clearTimeout(timeout);
@@ -265,10 +271,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 resolve(false);
             };
 
-            if (monetagAdSlot) {
-                monetagAdSlot.appendChild(s);
+            if (modalAdSlot) {
+                modalAdSlot.appendChild(s);
             } else {
-                // Fallback — append to body if slot somehow missing
                 document.body.appendChild(s);
             }
         });
@@ -366,10 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // ── 3. Disable button to prevent spam clicks ──────────────────
             generateBtn.disabled = true;
 
-            // ── 4. Adblock detection via Monetag script load attempt ──────
-            //    We inject the actual Monetag script; if it errors/times out
+            // ── 4. Adblock detection via Adsterra script load attempt ──────
+            //    We inject the actual Adsterra script; if it errors/times out
             //    the user has an ad blocker and we stop here permanently.
-            const adLoaded = await loadMonetagAd();
+            const adLoaded = await loadAdsterraAd();
             if (!adLoaded) {
                 showAdblockBlocked();
                 return; // button stays disabled
