@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /** Fetch the current usage count from Firestore (reset if new day) */
     async function fetchUsageCount(user) {
-        const usageRef = doc(db, "usage", user.uid);
+        const usageRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(usageRef);
         const today = getTodayString();
 
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /** Increment the usage count by 1 AFTER successful generation */
     async function incrementUsage(user) {
-        const usageRef = doc(db, "usage", user.uid);
+        const usageRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(usageRef);
         const today = getTodayString();
         const currentCount = docSnap.exists() && docSnap.data().lastReset === today
