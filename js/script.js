@@ -51,6 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeAdBtn = document.getElementById('close-ad-btn');
     const adBlockWarning = document.getElementById('adblock-warning-msg');
 
+    // --- USAGE COUNTER ELEMENTS ---
+    const usageCounterText = document.getElementById('usage-counter-text');
+    const usageCounterFill = document.getElementById('usage-counter-fill');
+    const limitWarningMsg = document.getElementById('limit-warning-msg');
+
     // ---------------------------------------------------------
     // 1. FILE UPLOAD LOGIC
     // ---------------------------------------------------------
@@ -130,6 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (generateBtn) {
                 generateBtn.disabled = false;
             }
+            // Refresh usage counter when user logs in
+            refreshUsageUI();
         } else {
             isLoggedIn = false;
             if (headerLoginBtn) {
@@ -187,34 +194,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 3. QUOTA LOGIC
+    // 3. USAGE QUOTA LOGIC (Firestore "usage" collection)
+    //
+    //    Collection: "usage"
+    //    Document ID: user.uid
+    //    Fields:
+    //      count     (number)    — prompts used today
+    //      lastReset (string)    — date string of last reset
+    //
+    //    Flow: CHECK quota (before ad) → SHOW ad → GENERATE → INCREMENT (after success)
     // ---------------------------------------------------------
-    async function checkAndConsumeQuota(user) {
-        const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
+    const MAX_DAILY = 5;
 
-        // Get today's local date string
-        const today = new Date().toLocaleDateString();
+    /** Get today's date string in user's local timezone */
+    function getTodayString() {
+        return new Date().toLocaleDateString();
+    }
+
+    /** Fetch the current usage count from Firestore (reset if new day) */
+    async function fetchUsageCount(user) {
+        const usageRef = doc(db, "usage", user.uid);
+        const docSnap = await getDoc(usageRef);
+        const today = getTodayString();
 
         if (docSnap.exists()) {
             const data = docSnap.data();
-
             if (data.lastReset !== today) {
-                // Reset for a new day
-                await setDoc(userRef, { dailyCount: 1, lastReset: today }, { merge: true });
-                return true;
-            } else {
-                if (data.dailyCount >= 5) {
-                    return false; // Limit reached
-                } else {
-                    await setDoc(userRef, { dailyCount: data.dailyCount + 1 }, { merge: true });
-                    return true;
-                }
+                // New day — reset to 0
+                await setDoc(usageRef, { count: 0, lastReset: today }, { merge: true });
+                return 0;
             }
+            return data.count || 0;
         } else {
-            // First time user
-            await setDoc(userRef, { dailyCount: 1, lastReset: today });
-            return true;
+            // First time user — create doc
+            await setDoc(usageRef, { count: 0, lastReset: today });
+            return 0;
+        }
+    }
+
+    /** Check if user has quota remaining (does NOT increment) */
+    async function checkQuota(user) {
+        const count = await fetchUsageCount(user);
+        return { allowed: count < MAX_DAILY, count };
+    }
+
+    /** Increment the usage count by 1 AFTER successful generation */
+    async function incrementUsage(user) {
+        const usageRef = doc(db, "usage", user.uid);
+        const docSnap = await getDoc(usageRef);
+        const today = getTodayString();
+        const currentCount = docSnap.exists() && docSnap.data().lastReset === today
+            ? (docSnap.data().count || 0)
+            : 0;
+        await setDoc(usageRef, { count: currentCount + 1, lastReset: today }, { merge: true });
+        return currentCount + 1;
+    }
+
+    /** Update the usage counter UI elements */
+    function updateUsageCounterUI(count) {
+        if (usageCounterText) {
+            usageCounterText.textContent = `Free Generations: ${count} / ${MAX_DAILY} used today`;
+        }
+        if (usageCounterFill) {
+            const pct = Math.min((count / MAX_DAILY) * 100, 100);
+            usageCounterFill.style.width = `${pct}%`;
+            // Change color when limit reached
+            usageCounterFill.style.background = count >= MAX_DAILY
+                ? '#f87171'
+                : 'var(--accent-gradient)';
+        }
+        if (limitWarningMsg) {
+            if (count >= MAX_DAILY) {
+                limitWarningMsg.style.display = 'block';
+                limitWarningMsg.textContent = 'Daily free limit reached. Come back tomorrow.';
+            } else {
+                limitWarningMsg.style.display = 'none';
+            }
+        }
+    }
+
+    /** Load and display usage count on page load (when user is logged in) */
+    async function refreshUsageUI() {
+        const user = auth.currentUser;
+        if (user) {
+            try {
+                const count = await fetchUsageCount(user);
+                updateUsageCounterUI(count);
+            } catch (e) {
+                console.error('Failed to fetch usage count:', e);
+            }
         }
     }
 
@@ -312,13 +380,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /** Open the ad modal and start the 20-second countdown */
+    /** Open the ad modal and start the 10-second countdown */
     function openAdModal() {
         _generationLocked = true; // re-lock on every new modal open
         lockBodyScroll();
         adModal.style.display = 'flex';
         closeAdBtn.style.display = 'none';
-        let timeLeft = 20;
+        let timeLeft = 10;
         adCountdown.textContent = timeLeft;
         if (adTimerLabel) adTimerLabel.textContent = 'seconds remaining';
 
@@ -372,19 +440,18 @@ document.addEventListener('DOMContentLoaded', () => {
             generateBtn.disabled = true;
 
             // ── 4. Adblock detection via Adsterra script load attempt ──────
-            //    We inject the actual Adsterra script; if it errors/times out
-            //    the user has an ad blocker and we stop here permanently.
             const adLoaded = await loadAdsterraAd();
             if (!adLoaded) {
                 showAdblockBlocked();
                 return; // button stays disabled
             }
 
-            // ── 5. Quota gate ─────────────────────────────────────────────
+            // ── 5. Quota CHECK (does not increment yet) ───────────────────
             try {
-                const hasQuota = await checkAndConsumeQuota(currentUser);
-                if (!hasQuota) {
-                    alert('Daily limit reached (5/5). Please come back tomorrow.');
+                const { allowed, count } = await checkQuota(currentUser);
+                updateUsageCounterUI(count);
+                if (!allowed) {
+                    alert('Daily free limit reached. Come back tomorrow.');
                     generateBtn.disabled = false;
                     return;
                 }
@@ -395,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // ── 6. Show Ad Modal with countdown ───────────────────────────
+            // ── 6. Show Ad Modal with 10-second countdown ─────────────────
             openAdModal();
         });
     }
@@ -410,7 +477,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 5. BACKEND API CALL
+    // 6. BACKEND API CALL
+    //    Sends Firebase ID token to worker for server-side verification.
+    //    Increments usage ONLY after successful generation.
     // ---------------------------------------------------------
     async function executeGeneration() {
         // Set UI to loading state
@@ -420,12 +489,22 @@ document.addEventListener('DOMContentLoaded', () => {
         resultText.value = '';
 
         try {
-            // Call API
-            const generatedPrompt = await callBackendAPI(currentImageFile);
+            // Get Firebase ID token for server-side auth + quota verification
+            const currentUser = auth.currentUser;
+            const idToken = currentUser ? await currentUser.getIdToken() : null;
+
+            // Call Worker API
+            const generatedPrompt = await callBackendAPI(currentImageFile, idToken);
             resultText.value = generatedPrompt;
+
+            // ── SUCCESS → increment usage count in Firestore ──────────────
+            if (currentUser) {
+                const newCount = await incrementUsage(currentUser);
+                updateUsageCounterUI(newCount);
+            }
         } catch (error) {
-            console.error("Error during generation", error);
-            alert("Generation failed: " + error.message);
+            console.error('Error during generation', error);
+            alert('Generation failed: ' + error.message);
         } finally {
             // Reset UI
             loadingMsg.style.display = 'none';
@@ -434,12 +513,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function callBackendAPI(imageFile) {
+    async function callBackendAPI(imageFile, idToken) {
         const formData = new FormData();
-        formData.append("image", imageFile);
+        formData.append('image', imageFile);
+
+        const headers = {};
+        if (idToken) {
+            headers['Authorization'] = `Bearer ${idToken}`;
+        }
 
         const response = await fetch('https://prompt-api.abusaifeshovon.workers.dev', {
             method: 'POST',
+            headers: headers,
             body: formData
         });
 
