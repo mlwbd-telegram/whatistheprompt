@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generate Prompt - What Is The Prompt?</title>
+    <title>Generate Prompt — What Is The Prompt?</title>
     <meta name="description"
         content="Upload a photo to generate an ultra-realistic identity-preserving AI image prompt.">
-
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
@@ -21,7 +22,7 @@
             <img src="logo.jpg" alt="What Is The Prompt?" class="logo-img" onerror="this.style.display='none'">
             <span class="site-title">What Is The Prompt?</span>
         </a>
-        <div class="header-right login-placeholder" id="auth-container">
+        <div class="header-right" id="auth-container">
             <button class="btn-google" id="header-login-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path
@@ -42,8 +43,8 @@
         </div>
     </header>
 
-    <!-- Header Leaderboard Banner -->
-    <div class="ad-container ad-banner" id="header-small-ad" style="margin: 0.75rem auto;">
+    <!-- Top Leaderboard Ad -->
+    <div class="ad-container ad-banner" id="header-small-ad" style="margin: 0.875rem auto;">
         <script>atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };</script>
         <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
     </div>
@@ -53,22 +54,22 @@
         <!-- STEP 1: UPLOAD -->
         <section class="tool-section" id="section-upload">
             <h2 class="section-title">
-                <span
-                    style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">01</span>
+                <span class="step-num">01</span>
                 Upload Image
             </h2>
             <div class="upload-area" id="drop-zone">
                 <div class="upload-icon">🖼️</div>
                 <p class="upload-text">Drop your photo here or click to browse</p>
                 <p class="upload-hint">Accepts JPG, PNG • Max recommended: 5MB</p>
-                <button class="btn-secondary" id="browse-btn">Choose File</button>
+                <button class="btn-secondary" id="browse-btn"
+                    style="margin-top: 0.25rem; position: relative; z-index: 2;">Choose File</button>
                 <input type="file" id="file-input" class="file-input" accept="image/jpeg, image/png">
             </div>
             <div class="preview-container" id="preview-container">
                 <img src="" alt="Preview" class="preview-image" id="image-preview">
-                <div style="margin-top: 0.75rem;">
+                <div style="margin-top: 0.875rem;">
                     <button class="btn-secondary" id="remove-image-btn">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5">
                             <path d="M18 6L6 18M6 6l12 12" />
                         </svg>
@@ -80,9 +81,8 @@
 
         <!-- STEP 2: ACCOUNT -->
         <section class="tool-section account-message" id="section-account">
-            <h2 class="section-title" style="width: 100%; text-align: left;">
-                <span
-                    style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">02</span>
+            <h2 class="section-title" style="margin-bottom: 0;">
+                <span class="step-num">02</span>
                 Account
             </h2>
             <p class="login-warning" id="login-warning-msg">Sign in with Google to continue. 5 free generations per day.
@@ -111,12 +111,11 @@
         <!-- STEP 3: GENERATE -->
         <section class="tool-section generate-area" id="section-generate">
             <h2 class="section-title" style="text-align: left;">
-                <span
-                    style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">03</span>
+                <span class="step-num">03</span>
                 Generate
             </h2>
 
-            <!-- Usage Counter Panel -->
+            <!-- Usage Counter -->
             <div class="usage-counter" id="usage-counter">
                 <div class="usage-counter-bar">
                     <div class="usage-counter-fill" id="usage-counter-fill" style="width: 0%;"></div>
@@ -125,32 +124,30 @@
             </div>
 
             <button class="btn-primary" id="generate-btn" disabled
-                style="width: 100%; justify-content: center; padding: 1rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                style="width: 100%; justify-content: center; padding: 0.875rem; font-size: 0.975rem; border-radius: 14px;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                 </svg>
                 Generate Prompt
             </button>
-            <!-- Adblock warning — shown by script.js if Adsterra script fails to load -->
+
             <p id="adblock-warning-msg"
-                style="display:none; color:#f87171; font-size:0.85rem; margin-top:0.75rem; text-align:center; font-weight:500;">
+                style="display:none; color:#f87171; font-size:0.83rem; margin-top:0.75rem; text-align:center; font-weight:500;">
             </p>
-            <!-- Daily limit reached warning -->
             <p id="limit-warning-msg"
-                style="display:none; color:#f87171; font-size:0.85rem; margin-top:0.75rem; text-align:center; font-weight:500;">
+                style="display:none; color:#f87171; font-size:0.83rem; margin-top:0.75rem; text-align:center; font-weight:500;">
             </p>
-            <p class="loading-text" id="loading-msg">⚡ Analyzing image with Llama 4 Vision...</p>
+            <p class="loading-text" id="loading-msg">Analyzing image with Llama 4 Vision...</p>
         </section>
 
         <!-- STEP 4: RESULT -->
         <section class="tool-section result-area" id="section-result">
             <h2 class="section-title">
-                <span
-                    style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">04</span>
+                <span class="step-num">04</span>
                 Result
             </h2>
-            <textarea class="prompt-textarea" id="result-text"
+            <textarea class="result-textarea" id="result-text"
                 placeholder="Your generated prompt will appear here after clicking Generate Prompt..."
                 readonly></textarea>
             <div class="result-actions">
@@ -162,21 +159,19 @@
                     Clear
                 </button>
                 <button class="btn-primary" id="copy-btn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2.5">
                         <rect x="9" y="9" width="13" height="13" rx="2" />
                         <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
                     </svg>
                     Copy Prompt
                 </button>
+                <span class="copy-success" id="copy-success">✓ Copied!</span>
             </div>
-            <p id="copy-success"
-                style="color: var(--success-color); font-size: 0.8rem; text-align: right; display: none; margin-top: 0.25rem;">
-                ✓ Copied to clipboard!</p>
         </section>
 
         <!-- Below Result Ad -->
-        <div class="ad-container ad-banner" id="below-result-ad">
+        <div class="ad-container ad-banner" id="below-result-ad" style="margin-top: 1.5rem;">
             <script>atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };</script>
             <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
         </div>
@@ -185,7 +180,7 @@
     <!-- FOOTER -->
     <footer class="footer">
         <p class="footer-text">&copy; 2026 What Is The Prompt? &nbsp;·&nbsp; Powered by Groq + Llama 4</p>
-        <div class="ad-container ad-banner" id="footer-ad-banner" style="margin: 0.75rem auto 0;">
+        <div class="ad-container ad-banner" id="footer-ad-banner" style="margin: 0.875rem auto 0;">
             <script>atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };</script>
             <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
         </div>
@@ -197,30 +192,28 @@
         <script src="https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js"></script>
     </div>
 
-    <!-- LEFT STICKY AD (mirrors the right-side box) -->
+    <!-- LEFT STICKY AD -->
     <div class="ad-sticky-left" id="left-sticky-ad">
         <script>atOptions = { 'key': 'e1d24c3cd11f87e62d2147e4f6ea76fa', 'format': 'iframe', 'height': 250, 'width': 300, 'params': {} };</script>
         <script src="https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js"></script>
     </div>
 
-    <!-- AD MODAL (Ad Gated Generation) -->
+    <!-- AD MODAL -->
     <!--
         ADSTERRA INTEGRATION POINT
-        The Adsterra ad script is loaded DYNAMICALLY by js/script.js when the user clicks
-        "Generate Prompt". It is injected into #modal-ad-slot at that moment.
+        The Adsterra ad script is loaded DYNAMICALLY by js/script.js when "Generate Prompt" is clicked.
         Do NOT add any Adsterra <script> tags here — script.js handles that.
         To update your Adsterra key, search for "ADSTERRA_KEY" in script.js.
     -->
     <div class="ad-modal-overlay" id="ad-modal" style="display: none;" aria-modal="true" role="dialog"
         aria-label="Watch ad to unlock prompt generation">
         <div class="ad-modal-content">
-            <h3>Please watch this ad to unlock prompt generation</h3>
-            <p>This tool is free. A short ad keeps it running — thank you for your support!</p>
+            <h3>One quick ad to unlock generation</h3>
+            <p>This tool is free. A short ad keeps it running — thank you!</p>
 
-            <!-- Adsterra 300x250 ad renders inside this div (injected by script.js) -->
+            <!-- Adsterra 300×250 ad renders here (injected by script.js) -->
             <div class="ad-modal-banner" id="modal-ad-slot">
-                <span id="ad-loading-label" style="color: var(--text-muted); font-size: 0.8rem; padding: 1rem;">Loading
-                    ad…</span>
+                <span id="ad-loading-label" style="color: var(--text-muted); font-size: 0.8rem;">Loading ad…</span>
             </div>
 
             <div class="ad-timer" id="ad-countdown">10</div>
@@ -230,7 +223,7 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                 </svg>
-                Close Ad & Generate Prompt
+                Close Ad &amp; Generate
             </button>
         </div>
     </div>
@@ -238,7 +231,7 @@
     <!-- Scripts -->
     <script type="module" src="js/script.js"></script>
 
-    <!-- Popunder Ad (must be at end of body for proper initialization) -->
+    <!-- Popunder Ad (end of body for proper initialization) -->
     <script src="https://pl28812047.effectivegatecpm.com/fd/13/e3/fd13e33fa993ae18b4f1420632eeb881.js"></script>
 </body>
 
