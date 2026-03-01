@@ -46,7 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- AD MODAL ELEMENTS ---
     const adModal = document.getElementById('ad-modal');
     const adCountdown = document.getElementById('ad-countdown');
+    const adTimerLabel = document.getElementById('ad-timer-label');
+    const monetagAdSlot = document.getElementById('monetag-ad-slot');
     const closeAdBtn = document.getElementById('close-ad-btn');
+    const adBlockWarning = document.getElementById('adblock-warning-msg');
 
     // ---------------------------------------------------------
     // 1. FILE UPLOAD LOGIC
@@ -184,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 3. QUOTA AND ADBLOCK LOGIC
+    // 3. QUOTA LOGIC
     // ---------------------------------------------------------
     async function checkAndConsumeQuota(user) {
         const userRef = doc(db, "users", user.uid);
@@ -215,40 +218,143 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function detectAdBlock() {
-        let isBlocked = false;
+    // ---------------------------------------------------------
+    // 4. ADBLOCK DETECTION (via Monetag script load attempt)
+    //
+    //    We try to load the real Monetag script into the modal slot.
+    //    If the script fires its onload → ad network is reachable → no adblock.
+    //    If the script fires its onerror → blocked  → disable the button.
+    //
+    //    ╔══════════════════════════════════════════════════════════╗
+    //    ║  MONETAG_SCRIPT_SRC — PASTE YOUR MONETAG ZONE URL HERE  ║
+    //    ║  Replace the placeholder URL below with the src value   ║
+    //    ║  from your Monetag dashboard (Zone → Get Tag → src=…)   ║
+    //    ╚══════════════════════════════════════════════════════════╝
+    const MONETAG_SCRIPT_SRC = 'https://gizokraijaw.net/vignette.min.js'; // ← REPLACE WITH YOUR MONETAG SCRIPT URL
+    const MONETAG_ZONE_ID = '10664014';                                  // ← REPLACE WITH YOUR MONETAG ZONE ID (if needed by the script)
 
-        // Create a bait element
-        const bait = document.createElement('div');
-        bait.innerHTML = '&nbsp;';
-        bait.className = 'adsbox ad-banner ad-container';
-        bait.style.position = 'absolute';
-        bait.style.top = '-999px';
-        document.body.appendChild(bait);
+    /**
+     * Injects the Monetag script into #monetag-ad-slot and returns a Promise
+     * that resolves with true (loaded OK) or false (blocked / error).
+     * The script is created fresh each call so the ad re-fires correctly.
+     */
+    function loadMonetagAd() {
+        return new Promise((resolve) => {
+            // Clear any previous content
+            if (monetagAdSlot) {
+                monetagAdSlot.innerHTML = '';
+            }
 
-        // Wait a tiny bit
-        await new Promise(resolve => setTimeout(resolve, 100));
+            const s = document.createElement('script');
+            s.src = MONETAG_SCRIPT_SRC;
+            if (MONETAG_ZONE_ID) s.dataset.zone = MONETAG_ZONE_ID;
+            s.async = true;
 
-        if (bait.offsetHeight === 0 || window.getComputedStyle(bait).display === 'none') {
-            isBlocked = true;
-        }
-        bait.remove();
+            // Resolved by whichever fires first
+            const timeout = setTimeout(() => {
+                // Treat silence after 3 s as blocked (conservative)
+                resolve(false);
+            }, 3000);
 
-        return isBlocked;
+            s.onload = () => {
+                clearTimeout(timeout);
+                resolve(true);
+            };
+            s.onerror = () => {
+                clearTimeout(timeout);
+                resolve(false);
+            };
+
+            if (monetagAdSlot) {
+                monetagAdSlot.appendChild(s);
+            } else {
+                // Fallback — append to body if slot somehow missing
+                document.body.appendChild(s);
+            }
+        });
     }
 
     // ---------------------------------------------------------
-    // 4. GENERATE BUTTON LOGIC & AD MODAL
+    // 5. GENERATE BUTTON LOGIC & AD MODAL
+    //
+    //  Race-condition guard: `_generationLocked` ensures the backend
+    //  API is never called until the full ad timer has expired AND the
+    //  user has clicked Close. Even if someone calls executeGeneration()
+    //  from the browser console, the lock will have already been consumed.
     // ---------------------------------------------------------
-    let adTimerInterval;
+    let adTimerInterval = null;
+    let _generationLocked = true; // starts locked — unlocked only after timer + close
+
+    /** Lock background scrolling while ad modal is visible */
+    function lockBodyScroll() { document.body.style.overflow = 'hidden'; }
+    /** Restore scrolling after modal is dismissed */
+    function unlockBodyScroll() { document.body.style.overflow = ''; }
+
+    /** Show the adblock warning and permanently disable the generate button */
+    function showAdblockBlocked() {
+        generateBtn.disabled = true;
+        generateBtn.textContent = 'Ad Blocker Detected';
+        if (adBlockWarning) {
+            adBlockWarning.style.display = 'block';
+            adBlockWarning.textContent = 'Ad blocker detected. Please disable ad blocker to use this tool.';
+        } else {
+            // Fallback — insert a warning paragraph near the button if element missing
+            const warn = document.createElement('p');
+            warn.id = 'adblock-warning-msg';
+            warn.style.cssText = 'color:#f87171;font-size:0.85rem;margin-top:0.75rem;text-align:center;';
+            warn.textContent = 'Ad blocker detected. Please disable ad blocker to use this tool.';
+            generateBtn.parentNode.insertBefore(warn, generateBtn.nextSibling);
+        }
+    }
+
+    /** Open the ad modal and start the 20-second countdown */
+    function openAdModal() {
+        _generationLocked = true; // re-lock on every new modal open
+        lockBodyScroll();
+        adModal.style.display = 'flex';
+        closeAdBtn.style.display = 'none';
+        let timeLeft = 20;
+        adCountdown.textContent = timeLeft;
+        if (adTimerLabel) adTimerLabel.textContent = 'seconds remaining';
+
+        // Clear any stale interval from a previous run
+        if (adTimerInterval) clearInterval(adTimerInterval);
+
+        adTimerInterval = setInterval(() => {
+            timeLeft--;
+            adCountdown.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(adTimerInterval);
+                adTimerInterval = null;
+                // Timer finished — unlock and reveal Close button
+                _generationLocked = false;
+                closeAdBtn.style.display = 'flex';
+                if (adTimerLabel) adTimerLabel.textContent = 'Ad complete — click below to generate!';
+            }
+        }, 1000);
+    }
+
+    /** Close the ad modal and restore scroll */
+    function closeAdModal() {
+        unlockBodyScroll();
+        adModal.style.display = 'none';
+        if (adTimerInterval) {
+            clearInterval(adTimerInterval);
+            adTimerInterval = null;
+        }
+    }
 
     if (generateBtn) {
         generateBtn.addEventListener('click', async () => {
+
+            // ── 1. Auth gate ──────────────────────────────────────────────
             if (!isLoggedIn) {
-                alert('Please sign in first.');
+                // Trigger login popup; do NOT show ad during login flow
+                await handleLogin();
                 return;
             }
 
+            // ── 2. Image gate ─────────────────────────────────────────────
             if (!currentImageFile) {
                 alert('Please upload an image first.');
                 return;
@@ -257,59 +363,43 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentUser = auth.currentUser;
             if (!currentUser) return;
 
-            // Disable button to prevent spam clicks
+            // ── 3. Disable button to prevent spam clicks ──────────────────
             generateBtn.disabled = true;
 
-            // Check AdBlock
-            const adBlocked = await detectAdBlock();
-            if (adBlocked) {
-                alert("Ad blocker detected. Please disable your ad blocker to use this tool.");
-                generateBtn.textContent = 'Ad Blocker Detected';
-                return; // Leave disabled
+            // ── 4. Adblock detection via Monetag script load attempt ──────
+            //    We inject the actual Monetag script; if it errors/times out
+            //    the user has an ad blocker and we stop here permanently.
+            const adLoaded = await loadMonetagAd();
+            if (!adLoaded) {
+                showAdblockBlocked();
+                return; // button stays disabled
             }
 
-            // Check Quota
+            // ── 5. Quota gate ─────────────────────────────────────────────
             try {
                 const hasQuota = await checkAndConsumeQuota(currentUser);
                 if (!hasQuota) {
-                    alert("Daily limit reached (5/5). Please come back tomorrow.");
+                    alert('Daily limit reached (5/5). Please come back tomorrow.');
                     generateBtn.disabled = false;
                     return;
                 }
             } catch (error) {
-                console.error("Error checking quota:", error);
-                alert("Failed to verify generation limits. Please try again.");
+                console.error('Error checking quota:', error);
+                alert('Failed to verify generation limits. Please try again.');
                 generateBtn.disabled = false;
                 return;
             }
 
-            // Show Ad Modal Overlay
-            adModal.style.display = 'flex';
-            closeAdBtn.style.display = 'none';
-            let timeLeft = 20;
-            adCountdown.textContent = timeLeft;
-
-            adTimerInterval = setInterval(() => {
-                timeLeft--;
-                adCountdown.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(adTimerInterval);
-                    closeAdBtn.style.display = 'block';
-                }
-            }, 1000);
-
-            // Trigger Vignette Ad if they want it on top of the modal
-            (function (s) {
-                s.dataset.zone = '10664014';
-                s.src = 'https://gizokraijaw.net/vignette.min.js';
-                [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
-            })(document.createElement('script'));
+            // ── 6. Show Ad Modal with countdown ───────────────────────────
+            openAdModal();
         });
     }
 
     if (closeAdBtn) {
         closeAdBtn.addEventListener('click', async () => {
-            adModal.style.display = 'none';
+            // Extra safety: only allow generation if lock released by timer
+            if (_generationLocked) return;
+            closeAdModal();
             await executeGeneration();
         });
     }
