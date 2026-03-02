@@ -126,17 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
             URL.revokeObjectURL(originalUrl);
             imagePreview.src = URL.createObjectURL(blob);
 
-            // Show size comparison
+            // Show optimized size only
             if (loaderEl) loaderEl.style.display = 'none';
             if (statsEl) {
                 const fmt = (bytes) => bytes >= 1_048_576
                     ? (bytes / 1_048_576).toFixed(1) + ' MB'
                     : Math.round(bytes / 1024) + ' KB';
-                const saved = Math.round((1 - optimizedSize / originalSize) * 100);
-                statsEl.innerHTML =
-                    `✅ Original: <strong>${fmt(originalSize)}</strong> &rarr; ` +
-                    `Optimized: <strong>${fmt(optimizedSize)}</strong> ` +
-                    `<span style="color:#10b981">(saved ${saved}%)</span>`;
+                statsEl.innerHTML = `Size: <strong>${fmt(optimizedSize)}</strong>`;
                 statsEl.style.display = 'block';
             }
         } catch (err) {
