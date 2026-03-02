@@ -229,40 +229,19 @@
     <!-- Scripts -->
     <script type="module" src="js/script.js"></script>
 
-    <!-- Popunder Ad: fires synchronously on first click (required so browser does not block the popup) -->
+    <!-- Popunder Ad: loads ad script in-page on first click. The ad network script handles opening the popunder window itself. -->
     <script>
         (function () {
             var _fired = false;
-
-            function _firePopunder(e) {
+            function _firePopunder() {
                 if (_fired) return;
                 _fired = true;
-
-                // 1. Open the popunder tab SYNCHRONOUSLY inside the event handler.
-                //    Browsers only allow window.open() in the same call stack as
-                //    a direct user gesture — do NOT defer this to a callback.
-                try {
-                    var w = window.open('about:blank', '_blank');
-                    if (w) {
-                        // 2. Load the ad network script into the new window
-                        var s = w.document.createElement('script');
-                        s.src = 'https://pl28812047.effectivegatecpm.com/fd/13/e3/fd13e33fa993ae18b4f1420632eeb881.js';
-                        s.async = true;
-                        w.document.head.appendChild(s);
-                        // Move new tab to background (popunder behaviour)
-                        try { window.focus(); } catch (ex) { /* ignore */ }
-                    }
-                } catch (err) {
-                    // Fallback: inject into current page body (popup blocked)
-                    var fallback = document.createElement('script');
-                    fallback.src = 'https://pl28812047.effectivegatecpm.com/fd/13/e3/fd13e33fa993ae18b4f1420632eeb881.js';
-                    fallback.async = true;
-                    document.body.appendChild(fallback);
-                }
+                var s = document.createElement('script');
+                s.src = 'https://pl28812047.effectivegatecpm.com/fd/13/e3/fd13e33fa993ae18b4f1420632eeb881.js';
+                s.async = true;
+                document.body.appendChild(s);
             }
-
-            // Only click reliably grants popup permission in all browsers
-            document.addEventListener('click', _firePopunder, { once: true });
+            document.addEventListener('click', _firePopunder, { once: true, passive: true });
         })();
     </script>
     <!-- Ad Auto-Refresh: refreshes all iframe ad slots every 60 s (tab-visible only) -->
