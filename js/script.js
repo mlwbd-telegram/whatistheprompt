@@ -205,29 +205,31 @@ document.addEventListener('DOMContentLoaded', () => {
     //    Flow: CHECK quota (before ad) → SHOW ad → GENERATE → INCREMENT (after success)
     // ---------------------------------------------------------
     const MAX_DAILY = 5;
+    const WORKER_URL = 'https://prompt-api.abusaifeshovon.workers.dev';
 
-    /** Get today's date string in user's local timezone */
+    /** Get today's date as YYYY-MM-DD (UTC, consistent with Worker) */
     function getTodayString() {
-        return new Date().toLocaleDateString();
+        return new Date().toISOString().slice(0, 10);
     }
 
     /** Fetch the current usage count from Firestore (reset if new day) */
     async function fetchUsageCount(user) {
-        const usageRef = doc(db, "users", user.uid);
+        // Collection: users_usage/{uid}  |  Fields: count, lastDate (YYYY-MM-DD)
+        const usageRef = doc(db, "users_usage", user.uid);
         const docSnap = await getDoc(usageRef);
         const today = getTodayString();
 
         if (docSnap.exists()) {
             const data = docSnap.data();
-            if (data.lastReset !== today) {
+            if (data.lastDate !== today) {
                 // New day — reset to 0
-                await setDoc(usageRef, { count: 0, lastReset: today }, { merge: true });
+                await setDoc(usageRef, { count: 0, lastDate: today }, { merge: true });
                 return 0;
             }
             return data.count || 0;
         } else {
             // First time user — create doc
-            await setDoc(usageRef, { count: 0, lastReset: today });
+            await setDoc(usageRef, { count: 0, lastDate: today });
             return 0;
         }
     }
@@ -240,20 +242,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /** Increment the usage count by 1 AFTER successful generation */
     async function incrementUsage(user) {
-        const usageRef = doc(db, "users", user.uid);
+        const usageRef = doc(db, "users_usage", user.uid);
         const docSnap = await getDoc(usageRef);
         const today = getTodayString();
-        const currentCount = docSnap.exists() && docSnap.data().lastReset === today
+        const currentCount = docSnap.exists() && docSnap.data().lastDate === today
             ? (docSnap.data().count || 0)
             : 0;
-        await setDoc(usageRef, { count: currentCount + 1, lastReset: today }, { merge: true });
+        await setDoc(usageRef, { count: currentCount + 1, lastDate: today }, { merge: true });
         return currentCount + 1;
     }
 
     /** Update the usage counter UI elements */
     function updateUsageCounterUI(count) {
         if (usageCounterText) {
-            usageCounterText.textContent = `Free Generations: ${count} / ${MAX_DAILY} used today`;
+            usageCounterText.textContent = `You have used ${count} / ${MAX_DAILY} free generations today`;
         }
         if (usageCounterFill) {
             const pct = Math.min((count / MAX_DAILY) * 100, 100);
@@ -273,16 +275,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /** Load and display usage count on page load (when user is logged in) */
+    /**
+     * Load and display usage count from the Worker's /api/usage endpoint.
+     * Falls back to local Firestore read if the Worker call fails.
+     */
     async function refreshUsageUI() {
         const user = auth.currentUser;
-        if (user) {
-            try {
-                const count = await fetchUsageCount(user);
-                updateUsageCounterUI(count);
-            } catch (e) {
-                console.error('Failed to fetch usage count:', e);
+        if (!user) return;
+        try {
+            // Primary: get live count from Worker (authoritative server-side count)
+            const idToken = await user.getIdToken();
+            const res = await fetch(`${WORKER_URL}/api/usage`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${idToken}` },
+            });
+            if (res.ok) {
+                const { used } = await res.json();
+                updateUsageCounterUI(used);
+                return;
             }
+        } catch (e) {
+            console.warn('Worker /api/usage failed, falling back to Firestore:', e);
+        }
+        // Fallback: local Firestore read
+        try {
+            const count = await fetchUsageCount(user);
+            updateUsageCounterUI(count);
+        } catch (e) {
+            console.error('Failed to fetch usage count:', e);
         }
     }
 
@@ -522,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
             headers['Authorization'] = `Bearer ${idToken}`;
         }
 
-        const response = await fetch('https://prompt-api.abusaifeshovon.workers.dev', {
+        const response = await fetch(WORKER_URL, {
             method: 'POST',
             headers: headers,
             body: formData
