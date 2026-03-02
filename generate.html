@@ -205,24 +205,28 @@
     -->
     <div class="ad-modal-overlay" id="ad-modal" style="display: none;" aria-modal="true" role="dialog"
         aria-label="Watch ad to unlock prompt generation">
-        <div class="ad-modal-content">
-            <h3>One quick ad to unlock generation</h3>
-            <p>This tool is free. A short ad keeps it running — thank you!</p>
+        <div class="ad-modal-ring" id="ad-modal-ring">
+            <div class="ad-modal-content">
+                <h3>One quick ad to unlock generation</h3>
+                <p>This tool is free. A short ad keeps it running — thank you!</p>
 
-            <!-- Adsterra 300×250 ad renders here (injected by script.js) -->
-            <div class="ad-modal-banner" id="modal-ad-slot">
-                <span id="ad-loading-label" style="color: var(--text-muted); font-size: 0.8rem;">Loading ad…</span>
+                <!-- Adsterra 300×250 ad renders here (injected by script.js) -->
+                <div class="ad-modal-banner" id="modal-ad-slot">
+                    <span id="ad-loading-label" style="color: var(--text-muted); font-size: 0.8rem;">Loading ad…</span>
+                </div>
+
+                <div class="ad-timer" id="ad-countdown">10</div>
+                <div class="ad-timer-label" id="ad-timer-label">seconds remaining</div>
+                <button class="btn-primary" id="close-ad-btn"
+                    style="display: none; width: 100%; justify-content: center;"
+                    aria-label="Close ad and generate prompt">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                    Close Ad &amp; Generate
+                </button>
             </div>
-
-            <div class="ad-timer" id="ad-countdown">10</div>
-            <div class="ad-timer-label" id="ad-timer-label">seconds remaining</div>
-            <button class="btn-primary" id="close-ad-btn" style="display: none; width: 100%; justify-content: center;"
-                aria-label="Close ad and generate prompt">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                </svg>
-                Close Ad &amp; Generate
-            </button>
         </div>
     </div>
 
