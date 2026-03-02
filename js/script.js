@@ -604,8 +604,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set UI to loading state
         generateBtn.disabled = true;
         generateBtn.textContent = 'Generating...';
-        loadingMsg.style.display = 'block';
         resultText.value = '';
+
+        // ── Animated step messages ────────────────────────────────────
+        const steps = [
+            '🔍 Analyzing image with Llama 4 Vision...',
+            '🧠 Extracting facial attributes...',
+            '✍️ Composing your identity-preserving prompt...',
+            '⏳ Almost done...',
+        ];
+        let stepIndex = 0;
+        loadingMsg.textContent = steps[0];
+        loadingMsg.style.display = 'block';
+        const stepInterval = setInterval(() => {
+            stepIndex = (stepIndex + 1) % steps.length;
+            loadingMsg.textContent = steps[stepIndex];
+        }, 2500);
+        // ─────────────────────────────────────────────────────────────
 
         try {
             // Get Firebase ID token for server-side auth + quota verification
@@ -625,12 +640,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error during generation', error);
             alert('Generation failed: ' + error.message);
         } finally {
-            // Reset UI
+            // Stop animation and reset UI
+            clearInterval(stepInterval);
             loadingMsg.style.display = 'none';
+            loadingMsg.textContent = 'Analyzing image with Llama 4 Vision...'; // reset text
             generateBtn.disabled = false;
             generateBtn.textContent = 'Generate Prompt';
         }
     }
+
 
     async function callBackendAPI(imageFile, idToken) {
         // imageFile is now always an optimized JPEG Blob (never the raw original).
