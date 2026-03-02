@@ -514,6 +514,14 @@ document.addEventListener('DOMContentLoaded', () => {
         adCountdown.textContent = timeLeft;
         if (adTimerLabel) adTimerLabel.textContent = 'seconds remaining';
 
+        // Restart ring sweep animation (force reflow so CSS animation replays)
+        const ring = document.getElementById('ad-modal-ring');
+        if (ring) {
+            ring.classList.remove('timer-running', 'timer-done');
+            void ring.offsetWidth; // trigger reflow
+            ring.classList.add('timer-running');
+        }
+
         // Clear any stale interval from a previous run
         if (adTimerInterval) clearInterval(adTimerInterval);
 
@@ -527,6 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 _generationLocked = false;
                 closeAdBtn.style.display = 'flex';
                 if (adTimerLabel) adTimerLabel.textContent = 'Ad complete — click below to generate!';
+                if (ring) { ring.classList.remove('timer-running'); ring.classList.add('timer-done'); }
             }
         }, 1000);
     }
@@ -539,6 +548,8 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(adTimerInterval);
             adTimerInterval = null;
         }
+        const ring = document.getElementById('ad-modal-ring');
+        if (ring) { ring.classList.remove('timer-running', 'timer-done'); }
     }
 
     if (generateBtn) {
