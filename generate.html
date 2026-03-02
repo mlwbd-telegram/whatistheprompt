@@ -60,10 +60,11 @@
             <div class="upload-area" id="drop-zone">
                 <div class="upload-icon">🖼️</div>
                 <p class="upload-text">Drop your photo here or click to browse</p>
-                <p class="upload-hint">Accepts JPG, PNG • Max recommended: 5MB</p>
+                <p class="upload-hint">Accepts JPG, PNG, WEBP, HEIC &bull; Auto-optimized before upload</p>
                 <button class="btn-secondary" id="browse-btn"
                     style="margin-top: 0.25rem; position: relative; z-index: 2;">Choose File</button>
-                <input type="file" id="file-input" class="file-input" accept="image/jpeg, image/png">
+                <input type="file" id="file-input" class="file-input"
+                    accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
             </div>
             <div class="preview-container" id="preview-container">
                 <img src="" alt="Preview" class="preview-image" id="image-preview">
@@ -76,6 +77,13 @@
                         Remove Image
                     </button>
                 </div>
+            </div>
+
+            <!-- Optimization status banner (populated by script.js) -->
+            <div id="optimization-status"
+                style="display:none; margin-top:0.75rem; text-align:center; font-size:0.84rem;">
+                <span id="optimization-loader" style="color:var(--text-muted);">&#9203; Optimizing image&#8230;</span>
+                <div id="optimization-stats" style="display:none; margin-top:0.35rem; color:var(--text-muted);"></div>
             </div>
         </section>
 
