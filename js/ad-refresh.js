@@ -1,111 +1,78 @@
 /**
- * ad-refresh.js — Reliable 60-second Adsterra iframe ad slot refresh.
- *
- * Why hardcoded configs? Adsterra replaces the original <script> tags with
- * iframes immediately on load, so reading keys dynamically from the DOM fails.
- * Instead we store the config here and re-inject the exact same scripts on
- * each refresh cycle.
- *
- * Policies met:
- *  - Adsterra allows iframe refresh ≥ 30 s for non-AMP placements (we use 60 s)
- *  - No main library re-injection
- *  - No page reload
- *  - Single interval (singleton guard)
- *  - Stops on tab hide resume without refresh, stops on page unload
+ * ad-refresh.js
+ * Loads Adsterra ads into empty div containers sequentially (400ms apart)
+ * to prevent atOptions global variable collision.
+ * Refreshes all slots every 60 seconds (only when tab is visible).
  */
 
 (function () {
     'use strict';
 
-    // ── SLOT CONFIGURATION ───────────────────────────────────────────────────
-    // Update keys/dimensions here if you change your Adsterra placement.
+    var SLOT_DELAY_MS = 400;   // gap between each slot injection
+    var REFRESH_MS = 60000; // 60-second refresh cycle
+
     var SLOTS = [
-        {
-            id: 'header-small-ad',
-            key: '7b616e0dce6848244919663e545f774d',
-            width: 728,
-            height: 90,
-            src: 'https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js'
-        },
-        {
-            id: 'below-result-ad',
-            key: '7b616e0dce6848244919663e545f774d',
-            width: 728,
-            height: 90,
-            src: 'https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js'
-        },
-        {
-            id: 'footer-ad-banner',
-            key: '7b616e0dce6848244919663e545f774d',
-            width: 728,
-            height: 90,
-            src: 'https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js'
-        },
-        {
-            id: 'sticky-ad-container',
-            key: 'e1d24c3cd11f87e62d2147e4f6ea76fa',
-            width: 300,
-            height: 250,
-            src: 'https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js'
-        },
-        {
-            id: 'left-sticky-ad',
-            key: 'e1d24c3cd11f87e62d2147e4f6ea76fa',
-            width: 300,
-            height: 250,
-            src: 'https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js'
-        }
+        { id: 'header-small-ad', key: '7b616e0dce6848244919663e545f774d', w: 728, h: 90 },
+        { id: 'below-result-ad', key: '7b616e0dce6848244919663e545f774d', w: 728, h: 90 },
+        { id: 'footer-ad-banner', key: '7b616e0dce6848244919663e545f774d', w: 728, h: 90 },
+        { id: 'sticky-ad-container', key: 'e1d24c3cd11f87e62d2147e4f6ea76fa', w: 300, h: 250 },
+        { id: 'left-sticky-ad', key: 'e1d24c3cd11f87e62d2147e4f6ea76fa', w: 300, h: 250 }
     ];
 
-    var REFRESH_MS = 60000; // 60 seconds
-
-    // ── STATE ────────────────────────────────────────────────────────────────
     var intervalId = null;
-    var cycleCount = 0;
+    var cycle = 0;
 
-    // ── CORE: inject a fresh ad into one container ───────────────────────────
-    function injectAd(slot) {
+    /**
+     * Inject ONE ad slot. Uses a plain global atOptions + invoke.js script pair.
+     * Because each slot waits SLOT_DELAY_MS before the next one fires,
+     * only one atOptions value is "live" at a time — no collision.
+     */
+    function injectSlot(slot) {
         var el = document.getElementById(slot.id);
         if (!el) return;
 
-        // Wipe current content (iframe + old scripts)
         el.innerHTML = '';
 
-        // 1. atOptions script (must execute before invoke.js)
-        var opts = document.createElement('script');
-        opts.text = "atOptions = { 'key': '" + slot.key + "', 'format': 'iframe', " +
-            "'height': " + slot.height + ", 'width': " + slot.width + ", 'params': {} };";
-        el.appendChild(opts);
+        // Set atOptions globally — safe because we stagger each slot
+        window.atOptions = {
+            'key': slot.key,
+            'format': 'iframe',
+            'height': slot.h,
+            'width': slot.w,
+            'params': {}
+        };
 
-        // 2. invoke.js — fresh request = new ad served by Adsterra
-        var invoke = document.createElement('script');
-        invoke.src = slot.src;
-        invoke.async = true;
-        el.appendChild(invoke);
+        // Dynamically create and append the invoke script
+        var s = document.createElement('script');
+        s.src = 'https://www.highperformanceformat.com/' + slot.key + '/invoke.js';
+        s.async = false; // synchronous so it reads atOptions immediately
+        el.appendChild(s);
     }
 
-    // ── CYCLE: refresh all slots ─────────────────────────────────────────────
-    function refreshAll() {
-        // Skip if tab not visible — saves ad impressions and CPU
-        if (document.visibilityState !== 'visible') return;
-
-        // Global kill-switch for networks that forbid refresh
-        if (window.AD_REFRESH_DISABLED === true) {
-            stopRefresh();
-            return;
-        }
-
-        cycleCount++;
-        console.debug('[ad-refresh] cycle ' + cycleCount);
-
-        SLOTS.forEach(function (slot) {
-            injectAd(slot);
+    /**
+     * Load all slots one by one with a SLOT_DELAY_MS gap between each.
+     */
+    function loadAllSequentially() {
+        SLOTS.forEach(function (slot, index) {
+            setTimeout(function () {
+                injectSlot(slot);
+            }, index * SLOT_DELAY_MS);
         });
     }
 
-    // ── INTERVAL MANAGEMENT ──────────────────────────────────────────────────
+    /**
+     * Refresh cycle: only runs when tab is visible.
+     */
+    function refreshAll() {
+        if (window.AD_REFRESH_DISABLED === true) { stopRefresh(); return; }
+        if (document.visibilityState !== 'visible') return;
+        cycle++;
+        console.debug('[ad-refresh] refresh cycle #' + cycle);
+        loadAllSequentially();
+    }
+
     function startRefresh() {
-        if (intervalId !== null) return;           // singleton guard
+        if (intervalId !== null) return; // singleton
         intervalId = setInterval(refreshAll, REFRESH_MS);
         console.debug('[ad-refresh] started — 60 s interval');
     }
@@ -114,40 +81,35 @@
         if (intervalId !== null) {
             clearInterval(intervalId);
             intervalId = null;
-            console.debug('[ad-refresh] stopped');
         }
     }
 
-    // ── INITIAL LOAD: ensure all slots are populated ─────────────────────────
-    function initialLoad() {
+    function init() {
         if (window.AD_REFRESH_DISABLED === true) return;
 
-        // Re-inject all slots once on load to guarantee they render,
-        // then start the 60-second refresh cycle.
-        SLOTS.forEach(function (slot) {
-            injectAd(slot);
-        });
+        // Load ads immediately on page load
+        loadAllSequentially();
 
-        startRefresh();
+        // Start refresh timer after all slots have loaded (give them room to settle)
+        var initDelay = SLOTS.length * SLOT_DELAY_MS + 1000;
+        setTimeout(startRefresh, initDelay);
 
-        // Auto-stop when user leaves the page
         window.addEventListener('pagehide', stopRefresh, { once: true });
         window.addEventListener('beforeunload', stopRefresh, { once: true });
     }
 
-    // Run after DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initialLoad);
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        // DOMContentLoaded already fired (e.g. script loaded with defer)
-        initialLoad();
+        init();
     }
 
     // Public API
     window.adRefresh = {
         start: startRefresh,
         stop: stopRefresh,
-        now: refreshAll      // force immediate refresh from console
+        now: refreshAll,
+        reload: loadAllSequentially
     };
 
 }());
