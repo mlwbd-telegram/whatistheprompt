@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Get Firebase ID token for server-side auth + quota verification
             const currentUser = auth.currentUser;
-            const idToken = currentUser ? await currentUser.getIdToken() : null;
+            const idToken = currentUser ? await currentUser.getIdToken(true) : null;
 
             // Call Worker API
             const generatedPrompt = await callBackendAPI(currentImageFile, idToken);
