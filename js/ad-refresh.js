@@ -1,145 +1,113 @@
 /**
- * ad-refresh.js — Auto-refresh Adsterra iframe ad slots every 60 seconds.
+ * ad-refresh.js — Reliable 60-second Adsterra iframe ad slot refresh.
  *
- * Rules:
- *  - Only refreshes when the browser tab is VISIBLE (Page Visibility API).
- *  - Never re-injects the main Adsterra library script.
- *  - Prevents multiple stacked intervals (singleton guard).
- *  - Stops automatically when the page is unloaded.
- *  - Skips the ad modal slot (#modal-ad-slot) — that is managed by script.js.
- *  - Provides a global kill-switch: window.AD_REFRESH_DISABLED = true.
+ * Why hardcoded configs? Adsterra replaces the original <script> tags with
+ * iframes immediately on load, so reading keys dynamically from the DOM fails.
+ * Instead we store the config here and re-inject the exact same scripts on
+ * each refresh cycle.
  *
- * Adsterra policy note:
- *  Adsterra allows iframe banner refresh ≥ 30 seconds for non-AMP placements.
- *  This implementation uses 60 s (well within policy).
- *  If you switch networks, set window.AD_REFRESH_DISABLED = true in your page.
+ * Policies met:
+ *  - Adsterra allows iframe refresh ≥ 30 s for non-AMP placements (we use 60 s)
+ *  - No main library re-injection
+ *  - No page reload
+ *  - Single interval (singleton guard)
+ *  - Stops on tab hide resume without refresh, stops on page unload
  */
 
 (function () {
     'use strict';
 
-    // ── CONFIG ──────────────────────────────────────────────────────────────
-    const REFRESH_INTERVAL_MS = 60_000;   // 60 seconds
-
-    // Selector for all refreshable ad containers.
-    // Each container must have a data-at-key and data-at-width/height attribute,
-    // OR we fall back to reading the stored options from the dataset below.
-    const AD_SLOT_IDS = [
-        'header-small-ad',
-        'below-result-ad',
-        'footer-ad-banner',
-        'sticky-ad-container',
-        'left-sticky-ad',
+    // ── SLOT CONFIGURATION ───────────────────────────────────────────────────
+    // Update keys/dimensions here if you change your Adsterra placement.
+    var SLOTS = [
+        {
+            id: 'header-small-ad',
+            key: '7b616e0dce6848244919663e545f774d',
+            width: 728,
+            height: 90,
+            src: 'https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js'
+        },
+        {
+            id: 'below-result-ad',
+            key: '7b616e0dce6848244919663e545f774d',
+            width: 728,
+            height: 90,
+            src: 'https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js'
+        },
+        {
+            id: 'footer-ad-banner',
+            key: '7b616e0dce6848244919663e545f774d',
+            width: 728,
+            height: 90,
+            src: 'https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js'
+        },
+        {
+            id: 'sticky-ad-container',
+            key: 'e1d24c3cd11f87e62d2147e4f6ea76fa',
+            width: 300,
+            height: 250,
+            src: 'https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js'
+        },
+        {
+            id: 'left-sticky-ad',
+            key: 'e1d24c3cd11f87e62d2147e4f6ea76fa',
+            width: 300,
+            height: 250,
+            src: 'https://www.highperformanceformat.com/e1d24c3cd11f87e62d2147e4f6ea76fa/invoke.js'
+        }
     ];
 
-    // Skip this slot — it is handled by script.js ad-modal logic.
-    const SKIP_IDS = new Set(['modal-ad-slot']);
+    var REFRESH_MS = 60000; // 60 seconds
 
     // ── STATE ────────────────────────────────────────────────────────────────
-    let intervalId = null;
-    let refreshCount = 0;
+    var intervalId = null;
+    var cycleCount = 0;
 
-    // ── HELPERS ──────────────────────────────────────────────────────────────
+    // ── CORE: inject a fresh ad into one container ───────────────────────────
+    function injectAd(slot) {
+        var el = document.getElementById(slot.id);
+        if (!el) return;
 
-    /**
-     * Re-inject the atOptions + invoke.js pair into a container.
-     * We read the original key/dimensions from data-* attributes that we
-     * stamp onto the container at init time.
-     */
-    function refreshSlot(container) {
-        const key = container.dataset.adKey;
-        const width = container.dataset.adWidth;
-        const height = container.dataset.adHeight;
-        const src = container.dataset.adSrc;
+        // Wipe current content (iframe + old scripts)
+        el.innerHTML = '';
 
-        if (!key || !src) return; // safety: slot was never initialised
+        // 1. atOptions script (must execute before invoke.js)
+        var opts = document.createElement('script');
+        opts.text = "atOptions = { 'key': '" + slot.key + "', 'format': 'iframe', " +
+            "'height': " + slot.height + ", 'width': " + slot.width + ", 'params': {} };";
+        el.appendChild(opts);
 
-        // Remove all children (old iframe + old scripts) without touching the
-        // container element itself, so layout is fully preserved.
-        container.innerHTML = '';
-
-        // Re-inject atOptions
-        const opts = document.createElement('script');
-        opts.textContent = `atOptions = { 'key': '${key}', 'format': 'iframe', 'height': ${height}, 'width': ${width}, 'params': {} };`;
-        container.appendChild(opts);
-
-        // Re-inject invoke.js — browser treats a newly appended script element
-        // as a fresh request, so the ad network serves a new ad.
-        const invoke = document.createElement('script');
-        invoke.src = src;
+        // 2. invoke.js — fresh request = new ad served by Adsterra
+        var invoke = document.createElement('script');
+        invoke.src = slot.src;
         invoke.async = true;
-        container.appendChild(invoke);
+        el.appendChild(invoke);
     }
 
-    /**
-     * Snapshot the original key & dimensions from the slot's inline scripts,
-     * then store them as data-* attributes for later re-injection.
-     */
-    function initSlot(container) {
-        // Look for the atOptions inline script inside the container.
-        const scripts = container.querySelectorAll('script');
-        let key = null, width = null, height = null, src = null;
+    // ── CYCLE: refresh all slots ─────────────────────────────────────────────
+    function refreshAll() {
+        // Skip if tab not visible — saves ad impressions and CPU
+        if (document.visibilityState !== 'visible') return;
 
-        scripts.forEach(function (s) {
-            if (s.src && s.src.includes('highperformanceformat.com')) {
-                src = s.src;
-            }
-            if (s.textContent && s.textContent.includes('atOptions')) {
-                // Parse key
-                const keyMatch = s.textContent.match(/'key'\s*:\s*'([^']+)'/);
-                if (keyMatch) key = keyMatch[1];
-                // Parse width
-                const wMatch = s.textContent.match(/'width'\s*:\s*(\d+)/);
-                if (wMatch) width = wMatch[1];
-                // Parse height
-                const hMatch = s.textContent.match(/'height'\s*:\s*(\d+)/);
-                if (hMatch) height = hMatch[1];
-            }
-        });
-
-        if (!key || !src) return false; // can't refresh this slot
-
-        container.dataset.adKey = key;
-        container.dataset.adWidth = width || '728';
-        container.dataset.adHeight = height || '90';
-        container.dataset.adSrc = src;
-
-        return true;
-    }
-
-    /**
-     * Run one refresh cycle across all tracked slots.
-     */
-    function runRefreshCycle() {
-        // Kill-switch check
+        // Global kill-switch for networks that forbid refresh
         if (window.AD_REFRESH_DISABLED === true) {
             stopRefresh();
             return;
         }
 
-        // Only refresh while the tab is visible
-        if (document.visibilityState !== 'visible') return;
+        cycleCount++;
+        console.debug('[ad-refresh] cycle ' + cycleCount);
 
-        refreshCount++;
-        console.debug(`[ad-refresh] cycle #${refreshCount}`);
-
-        AD_SLOT_IDS.forEach(function (id) {
-            if (SKIP_IDS.has(id)) return;
-            const el = document.getElementById(id);
-            if (el && el.dataset.adKey) {
-                refreshSlot(el);
-            }
+        SLOTS.forEach(function (slot) {
+            injectAd(slot);
         });
     }
 
-    // ── LIFECYCLE ────────────────────────────────────────────────────────────
-
+    // ── INTERVAL MANAGEMENT ──────────────────────────────────────────────────
     function startRefresh() {
-        // Singleton guard — never stack multiple intervals
-        if (intervalId !== null) return;
-
-        intervalId = setInterval(runRefreshCycle, REFRESH_INTERVAL_MS);
-        console.debug('[ad-refresh] started (60 s interval)');
+        if (intervalId !== null) return;           // singleton guard
+        intervalId = setInterval(refreshAll, REFRESH_MS);
+        console.debug('[ad-refresh] started — 60 s interval');
     }
 
     function stopRefresh() {
@@ -150,40 +118,36 @@
         }
     }
 
-    // ── INIT ─────────────────────────────────────────────────────────────────
-
-    function init() {
-        // Respect global kill-switch
+    // ── INITIAL LOAD: ensure all slots are populated ─────────────────────────
+    function initialLoad() {
         if (window.AD_REFRESH_DISABLED === true) return;
 
-        let slots = 0;
-        AD_SLOT_IDS.forEach(function (id) {
-            if (SKIP_IDS.has(id)) return;
-            const el = document.getElementById(id);
-            if (el && initSlot(el)) slots++;
+        // Re-inject all slots once on load to guarantee they render,
+        // then start the 60-second refresh cycle.
+        SLOTS.forEach(function (slot) {
+            injectAd(slot);
         });
 
-        if (slots === 0) {
-            console.debug('[ad-refresh] no valid slots found, refresh not started');
-            return;
-        }
-
-        console.debug(`[ad-refresh] initialised ${slots} slot(s)`);
         startRefresh();
 
-        // Stop on page unload to prevent zombie intervals
+        // Auto-stop when user leaves the page
         window.addEventListener('pagehide', stopRefresh, { once: true });
         window.addEventListener('beforeunload', stopRefresh, { once: true });
     }
 
-    // Wait until the DOM is fully loaded before scanning for ad containers.
+    // Run after DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', initialLoad);
     } else {
-        init();
+        // DOMContentLoaded already fired (e.g. script loaded with defer)
+        initialLoad();
     }
 
-    // Expose stop/start for external control (e.g. from script.js)
-    window.adRefresh = { start: startRefresh, stop: stopRefresh };
+    // Public API
+    window.adRefresh = {
+        start: startRefresh,
+        stop: stopRefresh,
+        now: refreshAll      // force immediate refresh from console
+    };
 
 }());
