@@ -735,6 +735,46 @@ button {
   padding: 1.5rem;
 }
 
+/* ── Timer ring wrapper ──────────────────────────────────────── */
+@property --sweep {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 360deg;
+}
+
+@keyframes timerSweep {
+  from {
+    --sweep: 360deg;
+  }
+
+  to {
+    --sweep: 0deg;
+  }
+}
+
+.ad-modal-ring {
+  position: relative;
+  border-radius: calc(var(--r-xl) + 3px);
+  padding: 2px;
+  /* border thickness */
+  background: conic-gradient(from -90deg,
+      #6366f1 0deg,
+      #8b5cf6 calc(var(--sweep) * 0.5),
+      #22d3ee var(--sweep),
+      rgba(255, 255, 255, 0.06) var(--sweep));
+  box-shadow: 0 0 32px rgba(99, 102, 241, 0.25);
+  transition: box-shadow 0.5s;
+}
+
+.ad-modal-ring.timer-running {
+  animation: timerSweep 10s linear forwards;
+}
+
+.ad-modal-ring.timer-done {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
 .ad-modal-content {
   background: rgba(12, 12, 26, 0.95);
   border: 1px solid var(--border-accent);
