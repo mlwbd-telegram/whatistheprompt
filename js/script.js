@@ -98,20 +98,123 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function handleFileSelect(file) {
-        if (!file.type.match('image.*')) {
-            alert('Please select an image file (JPG or PNG).');
+    async function handleFileSelect(file) {
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file (JPG, PNG, WEBP, HEIC).');
             return;
         }
 
-        currentImageFile = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            imagePreview.src = e.target.result;
-            dropZone.style.display = 'none';
-            previewContainer.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+        // Show a temporary preview of the original file while we optimize
+        const originalUrl = URL.createObjectURL(file);
+        imagePreview.src = originalUrl;
+        dropZone.style.display = 'none';
+        previewContainer.style.display = 'block';
+
+        // Show optimization status
+        const statusEl = document.getElementById('optimization-status');
+        const loaderEl = document.getElementById('optimization-loader');
+        const statsEl = document.getElementById('optimization-stats');
+        if (statusEl) { statusEl.style.display = 'block'; }
+        if (loaderEl) { loaderEl.style.display = 'inline'; }
+        if (statsEl) { statsEl.style.display = 'none'; }
+
+        try {
+            const { blob, originalSize, optimizedSize } = await optimizeImage(file);
+            currentImageFile = blob;
+
+            // Switch preview to optimized blob URL
+            URL.revokeObjectURL(originalUrl);
+            imagePreview.src = URL.createObjectURL(blob);
+
+            // Show size comparison
+            if (loaderEl) loaderEl.style.display = 'none';
+            if (statsEl) {
+                const fmt = (bytes) => bytes >= 1_048_576
+                    ? (bytes / 1_048_576).toFixed(1) + ' MB'
+                    : Math.round(bytes / 1024) + ' KB';
+                const saved = Math.round((1 - optimizedSize / originalSize) * 100);
+                statsEl.innerHTML =
+                    `✅ Original: <strong>${fmt(originalSize)}</strong> &rarr; ` +
+                    `Optimized: <strong>${fmt(optimizedSize)}</strong> ` +
+                    `<span style="color:#10b981">(saved ${saved}%)</span>`;
+                statsEl.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Image optimization failed, falling back to original:', err);
+            currentImageFile = file; // safe fallback
+            if (loaderEl) loaderEl.style.display = 'none';
+            if (statsEl) {
+                statsEl.innerHTML = '⚠️ Optimization failed — sending original.';
+                statsEl.style.display = 'block';
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // IMAGE OPTIMIZER — Canvas-based, fully client-side
+    //   • Resize: longest side ≤ 896 px (preserve aspect ratio)
+    //   • Format: always JPEG (strips EXIF as canvas side-effect)
+    //   • Quality: 0.74 → step down to 0.64 / 0.54 if > 350 KB
+    //   • Hard cap: 450 KB
+    // ---------------------------------------------------------
+    function optimizeImage(file) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+
+            img.onload = () => {
+                URL.revokeObjectURL(objectUrl);
+
+                const MAX_SIDE = 896;
+                let { width, height } = img;
+
+                // Downscale only — never upscale
+                if (width > MAX_SIDE || height > MAX_SIDE) {
+                    if (width >= height) {
+                        height = Math.round(height * MAX_SIDE / width);
+                        width = MAX_SIDE;
+                    } else {
+                        width = Math.round(width * MAX_SIDE / height);
+                        height = MAX_SIDE;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                // Quality step-down: 0.74 → 0.64 → 0.54
+                const TARGET_SIZE = 350_000; // 350 KB ideal
+                const qualities = [0.74, 0.64, 0.54];
+                let qi = 0;
+
+                const tryExport = () => {
+                    canvas.toBlob(blob => {
+                        if (!blob) { reject(new Error('Canvas toBlob failed')); return; }
+                        if (blob.size > TARGET_SIZE && qi < qualities.length - 1) {
+                            qi++;
+                            tryExport();
+                        } else {
+                            resolve({
+                                blob,
+                                originalSize: file.size,
+                                optimizedSize: blob.size
+                            });
+                        }
+                    }, 'image/jpeg', qualities[qi]);
+                };
+
+                tryExport();
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+                reject(new Error('Failed to load image for optimization'));
+            };
+
+            img.src = objectUrl;
+        });
     }
 
     // ---------------------------------------------------------
@@ -534,8 +637,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function callBackendAPI(imageFile, idToken) {
+        // imageFile is now always an optimized JPEG Blob (never the raw original).
+        // FormData.append() accepts Blob directly; we give it a .jpg filename
+        // so the Worker's multipart parser labels it correctly.
         const formData = new FormData();
-        formData.append('image', imageFile);
+        formData.append('image', imageFile, 'photo.jpg');
 
         const headers = {};
         if (idToken) {
