@@ -358,11 +358,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (usageCounterFill) {
             const pct = Math.min((count / MAX_DAILY) * 100, 100);
-            usageCounterFill.style.width = `${pct}%`;
-            // Change color when limit reached
-            usageCounterFill.style.background = count >= MAX_DAILY
-                ? '#f87171'
-                : 'var(--accent-gradient)';
+            // Use rAF so the browser paints width:0% first, letting the CSS transition animate
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    usageCounterFill.style.width = `${pct}%`;
+                    // Use the correct CSS variable (--accent-gradient doesn't exist; --grad-primary does)
+                    usageCounterFill.style.background = count >= MAX_DAILY
+                        ? '#f87171'
+                        : 'var(--grad-primary)';
+                });
+            });
         }
         if (limitWarningMsg) {
             if (count >= MAX_DAILY) {
