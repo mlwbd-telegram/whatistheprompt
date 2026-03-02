@@ -239,8 +239,23 @@
     <!-- Scripts -->
     <script type="module" src="js/script.js"></script>
 
-    <!-- Popunder Ad (end of body for proper initialization) -->
-    <script src="https://pl28812047.effectivegatecpm.com/fd/13/e3/fd13e33fa993ae18b4f1420632eeb881.js"></script>
+    <!-- Popunder Ad: fires on first user interaction (required by browser popup policy) -->
+    <script>
+        (function () {
+            var _fired = false;
+            function _firePopunder() {
+                if (_fired) return;
+                _fired = true;
+                var s = document.createElement('script');
+                s.src = 'https://pl28812047.effectivegatecpm.com/fd/13/e3/fd13e33fa993ae18b4f1420632eeb881.js';
+                s.async = true;
+                document.body.appendChild(s);
+            }
+            document.addEventListener('click', _firePopunder, { once: true, passive: true });
+            document.addEventListener('touchstart', _firePopunder, { once: true, passive: true });
+            document.addEventListener('keydown', _firePopunder, { once: true, passive: true });
+        })();
+    </script>
 </body>
 
 </html>
