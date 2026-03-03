@@ -98,9 +98,18 @@
         </div>
 
         <!-- AD SPACE -->
-        <div class="ad-container ad-banner" id="home-ad-banner" style="margin: 2.5rem auto 0; max-width:728px;">
+        <div class="ad-container ad-banner" id="home-ad-banner" style="margin: 2.5rem auto 0;">
             <script>
-                atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
+                (function () {
+                    var w = window.innerWidth || document.documentElement.clientWidth;
+                    if (w >= 728) {
+                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
+                    } else if (w >= 468) {
+                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 60, 'width': 468, 'params': {} };
+                    } else {
+                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
+                    }
+                })();
             </script>
             <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
         </div>
@@ -111,12 +120,29 @@
         <p class="footer-text">&copy; 2026 What Is The Prompt? &nbsp;·&nbsp; 5 free generations per day</p>
         <div class="ad-container ad-banner" id="footer-ad-banner" style="margin: 0.875rem auto 0;">
             <script>
-                atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
+                (function () {
+                    var w = window.innerWidth || document.documentElement.clientWidth;
+                    if (w >= 728) {
+                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
+                    } else if (w >= 468) {
+                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 60, 'width': 468, 'params': {} };
+                    } else {
+                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
+                    }
+                })();
             </script>
             <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
         </div>
     </footer>
     <script type="module" src="js/script.js"></script>
+
+    <!-- Mobile sticky bottom banner ad (320x50) -->
+    <div class="ad-sticky-bottom-mobile" id="mobile-sticky-ad">
+        <script>
+            atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
+        </script>
+        <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
+    </div>
 
 </body>
 
