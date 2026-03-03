@@ -152,9 +152,7 @@
                 Generate Prompt
             </button>
 
-            <p id="adblock-warning-msg"
-                style="display:none; color:#f87171; font-size:0.83rem; margin-top:0.75rem; text-align:center; font-weight:500;">
-            </p>
+
             <p id="limit-warning-msg"
                 style="display:none; color:#f87171; font-size:0.83rem; margin-top:0.75rem; text-align:center; font-weight:500;">
             </p>
@@ -238,12 +236,7 @@
 
 
     <!-- AD MODAL -->
-    <!--
-        ADSTERRA INTEGRATION POINT
-        The Adsterra ad script is loaded DYNAMICALLY by js/script.js when "Generate Prompt" is clicked.
-        Do NOT add any Adsterra <script> tags here — script.js handles that.
-        To update your Adsterra key, search for "ADSTERRA_KEY" in script.js.
-    -->
+
     <div class="ad-modal-overlay" id="ad-modal" style="display: none;" aria-modal="true" role="dialog"
         aria-label="Watch ad to unlock prompt generation">
         <div class="ad-modal-ring" id="ad-modal-ring">
@@ -273,8 +266,7 @@
 
     <!-- Scripts -->
     <script type="module" src="js/script.js"></script>
-    <!-- Anti-AdBlock detection — must load after DOM is ready -->
-    <script src="js/antiAdblock.js" defer></script>
+
 
     <!-- Mobile sticky bottom banner ad (320x50) -->
     <div class="ad-sticky-bottom-mobile" id="mobile-sticky-ad">
