@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const adTimerLabel = document.getElementById('ad-timer-label');
     const modalAdSlot = document.getElementById('modal-ad-slot');
     const closeAdBtn = document.getElementById('close-ad-btn');
-    const adBlockWarning = document.getElementById('adblock-warning-msg');
 
     // --- USAGE COUNTER ELEMENTS ---
     const usageCounterText = document.getElementById('usage-counter-text');
@@ -410,66 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ---------------------------------------------------------
-    // 4. ADBLOCK DETECTION (via Adsterra script load attempt)
-    //
-    //    We inject the real Adsterra invoke.js into the modal slot.
-    //    If the script fires its onload → ad network is reachable → no adblock.
-    //    If the script fires its onerror → blocked → disable the button.
-    //
-    //    ╔═══════════════════════════════════════════════════════════╗
-    //    ║  ADSTERRA CONFIG — Update the key below if zone changes  ║
-    //    ╚═══════════════════════════════════════════════════════════╝
-    const ADSTERRA_KEY = 'e1d24c3cd11f87e62d2147e4f6ea76fa';
-    const ADSTERRA_SCRIPT_SRC = `https://www.highperformanceformat.com/${ADSTERRA_KEY}/invoke.js`;
-
-    /**
-     * Injects the Adsterra 300×250 ad into #modal-ad-slot and returns a Promise
-     * that resolves with true (loaded OK) or false (blocked / error).
-     * The script is created fresh each call so the ad re-renders correctly.
-     */
-    function loadAdsterraAd() {
-        return new Promise((resolve) => {
-            // Clear any previous ad content
-            if (modalAdSlot) {
-                modalAdSlot.innerHTML = '';
-            }
-
-            // Set global atOptions BEFORE injecting invoke.js (Adsterra reads this)
-            window.atOptions = {
-                'key': ADSTERRA_KEY,
-                'format': 'iframe',
-                'height': 250,
-                'width': 300,
-                'params': {}
-            };
-
-            const s = document.createElement('script');
-            s.src = ADSTERRA_SCRIPT_SRC;
-            s.async = true;
-
-            // Resolved by whichever fires first
-            const timeout = setTimeout(() => {
-                // Treat silence after 4s as blocked (conservative)
-                resolve(false);
-            }, 4000);
-
-            s.onload = () => {
-                clearTimeout(timeout);
-                resolve(true);
-            };
-            s.onerror = () => {
-                clearTimeout(timeout);
-                resolve(false);
-            };
-
-            if (modalAdSlot) {
-                modalAdSlot.appendChild(s);
-            } else {
-                document.body.appendChild(s);
-            }
-        });
-    }
 
     // ---------------------------------------------------------
     // 5. GENERATE BUTTON LOGIC & AD MODAL
@@ -487,22 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
     /** Restore scrolling after modal is dismissed */
     function unlockBodyScroll() { document.body.style.overflow = ''; }
 
-    /** Show the adblock warning and permanently disable the generate button */
-    function showAdblockBlocked() {
-        generateBtn.disabled = true;
-        generateBtn.textContent = 'Ad Blocker Detected';
-        if (adBlockWarning) {
-            adBlockWarning.style.display = 'block';
-            adBlockWarning.textContent = 'Ad blocker detected. Please disable ad blocker to use this tool.';
-        } else {
-            // Fallback — insert a warning paragraph near the button if element missing
-            const warn = document.createElement('p');
-            warn.id = 'adblock-warning-msg';
-            warn.style.cssText = 'color:#f87171;font-size:0.85rem;margin-top:0.75rem;text-align:center;';
-            warn.textContent = 'Ad blocker detected. Please disable ad blocker to use this tool.';
-            generateBtn.parentNode.insertBefore(warn, generateBtn.nextSibling);
-        }
-    }
 
     /** Open the ad modal and start the 10-second countdown */
     function openAdModal() {
@@ -574,12 +497,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // ── 3. Disable button to prevent spam clicks ──────────────────
             generateBtn.disabled = true;
 
-            // ── 4. Adblock detection via Adsterra script load attempt ──────
-            const adLoaded = await loadAdsterraAd();
-            if (!adLoaded) {
-                showAdblockBlocked();
-                return; // button stays disabled
-            }
 
             // ── 5. Quota CHECK (does not increment yet) ───────────────────
             try {
