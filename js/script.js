@@ -5,7 +5,7 @@ import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/fireb
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyARHithRPMeScrInNAyT-JNIOAklJ2lJrI",
-    authDomain: "https://whatistheprompt.pages.dev",
+    authDomain: "whatistheprompt-f21ee.firebaseapp.com",
     projectId: "whatistheprompt-f21ee",
     storageBucket: "whatistheprompt-f21ee.firebasestorage.app",
     messagingSenderId: "118376175287",
