@@ -437,6 +437,27 @@ document.addEventListener('DOMContentLoaded', () => {
         adCountdown.textContent = timeLeft;
         if (adTimerLabel) adTimerLabel.textContent = 'seconds remaining';
 
+        // ── Inject Adsterra 300×250 ad into the modal slot ───────────
+        const ADSTERRA_KEY = 'e1d24c3cd11f87e62d2147e4f6ea76fa';
+        if (modalAdSlot) {
+            modalAdSlot.innerHTML = ''; // clear previous ad
+            const adLabel = document.getElementById('ad-loading-label');
+            if (adLabel) adLabel.style.display = 'block';
+
+            window.atOptions = {
+                'key': ADSTERRA_KEY,
+                'format': 'iframe',
+                'height': 250,
+                'width': 300,
+                'params': {}
+            };
+            const s = document.createElement('script');
+            s.src = `https://www.highperformanceformat.com/${ADSTERRA_KEY}/invoke.js`;
+            s.async = true;
+            s.onload = () => { if (adLabel) adLabel.style.display = 'none'; };
+            modalAdSlot.appendChild(s);
+        }
+
         // Restart ring sweep animation (force reflow so CSS animation replays)
         const ring = document.getElementById('ad-modal-ring');
         if (ring) {
