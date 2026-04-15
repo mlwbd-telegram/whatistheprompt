@@ -3,14 +3,24 @@
  *
  * Fetches JSON data and renders cards into target containers.
  * Used on homepage previews, /guides.html, and /blog.html.
- *
- * Usage:
- *   loadCards({
- *     dataUrl: '/data/guides.json',
- *     containerId: 'guides-grid',
- *     limit: 4
- *   });
  */
+
+/**
+ * Resolve the correct base path for assets.
+ * Works on any deployment: root domain, subpath (GitHub Pages), Netlify, etc.
+ * Finds the loader.js <script> tag and derives the site root from its URL.
+ */
+function getBasePath() {
+  const scripts = document.querySelectorAll('script[src]');
+  for (const s of scripts) {
+    if (s.src && s.src.includes('loader.js')) {
+      const url = new URL(s.src);
+      // Remove "js/loader.js" suffix to get root path
+      return url.pathname.replace(/js\/loader\.js$/, '');
+    }
+  }
+  return '/';
+}
 
 function loadCards(options) {
   const { dataUrl, containerId, limit, showAll } = options;
@@ -29,7 +39,10 @@ function loadCards(options) {
     </div>
   `;
 
-  fetch(dataUrl)
+  const base = getBasePath();
+  const resolvedUrl = base + dataUrl;
+
+  fetch(resolvedUrl)
     .then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
       return res.json();
@@ -56,7 +69,10 @@ function loadCards(options) {
         const icon = item.icon || '📄';
         const title = escapeHtml(item.title || 'Untitled');
         const desc = escapeHtml(item.desc || '');
-        const url = item.url || '#';
+
+        // Resolve card link URLs relative to site root (strip leading slash, prepend base)
+        const rawUrl = item.url || '#';
+        const url = rawUrl === '#' ? '#' : base + rawUrl.replace(/^\//, '');
 
         card.innerHTML = `
           <div class="blog-card-icon">${icon}</div>
@@ -74,7 +90,7 @@ function loadCards(options) {
       });
     })
     .catch((err) => {
-      console.error(`[loader.js] Failed to load ${dataUrl}:`, err);
+      console.error(`[loader.js] Failed to load ${resolvedUrl}:`, err);
       container.innerHTML = `
         <div class="error-state" style="text-align:center; padding:3rem; color:var(--error); font-size:0.9rem;">
           <p>⚠️ Failed to load content. Please try again later.</p>
@@ -93,13 +109,13 @@ function escapeHtml(text) {
 }
 
 /* ─── Auto-initialize on DOM ready ───────────────────────────
-   Detects page context and loads appropriate content.
+   Detects page by container presence — NOT by URL path.
+   This works correctly on any deployment URL structure.
 */
 document.addEventListener('DOMContentLoaded', () => {
-  const path = window.location.pathname;
 
-  // /guides.html — load all guides
-  if (path.includes('guides.html')) {
+  // guides.html
+  if (document.getElementById('guides-grid')) {
     loadCards({
       dataUrl: 'data/guides.json',
       containerId: 'guides-grid',
@@ -107,8 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // /blog.html — load all blog posts
-  if (path.includes('blog.html')) {
+  // blog.html
+  if (document.getElementById('blog-grid')) {
     loadCards({
       dataUrl: 'data/blog.json',
       containerId: 'blog-grid',
@@ -116,24 +132,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Homepage — load preview cards (3–4 each)
-  if (path.endsWith('/') || path.includes('index.html')) {
-    // Guides preview on homepage
-    if (document.getElementById('home-guides-preview')) {
-      loadCards({
-        dataUrl: 'data/guides.json',
-        containerId: 'home-guides-preview',
-        limit: 4,
-      });
-    }
-
-    // Blog preview on homepage
-    if (document.getElementById('home-blog-preview')) {
-      loadCards({
-        dataUrl: 'data/blog.json',
-        containerId: 'home-blog-preview',
-        limit: 4,
-      });
-    }
+  // Homepage — guides preview
+  if (document.getElementById('home-guides-preview')) {
+    loadCards({
+      dataUrl: 'data/guides.json',
+      containerId: 'home-guides-preview',
+      limit: 4,
+    });
   }
+
+  // Homepage — blog preview
+  if (document.getElementById('home-blog-preview')) {
+    loadCards({
+      dataUrl: 'data/blog.json',
+      containerId: 'home-blog-preview',
+      limit: 4,
+    });
+  }
+
 });
