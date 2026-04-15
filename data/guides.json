@@ -2,25 +2,25 @@
   {
     "title": "How to Keep the Same Face in AI Images",
     "desc": "Discover the exact techniques to preserve facial identity across every AI-generated image — from Midjourney to Flux.",
-    "url": "/guides/same-face.html",
+    "url": "/how-to-keep-same-face-ai.html",
     "icon": "🎭"
   },
   {
     "title": "AI Face Consistency Guide",
     "desc": "Master the art of face consistency across AI-generated portraits. Learn prompt engineering secrets professionals use.",
-    "url": "/guides/ai-consistency.html",
+    "url": "/ai-face-consistency-guide.html",
     "icon": "📐"
   },
   {
     "title": "Best Prompt for Same Face AI",
     "desc": "Get the best prompt templates that guarantee the same face appears in every AI-generated image — copy and paste ready.",
-    "url": "/guides/best-prompt.html",
+    "url": "/best-prompt-same-face-ai.html",
     "icon": "✍️"
   },
   {
     "title": "Why AI Changes Faces",
     "desc": "Understand why AI alters faces between generations and how to fix it with the right prompt structure and identity locks.",
-    "url": "/guides/why-ai-changes-faces.html",
+    "url": "/why-ai-changes-faces.html",
     "icon": "🔍"
   }
 ]
