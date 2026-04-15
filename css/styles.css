@@ -1018,6 +1018,65 @@ main {
 }
 
 /* =============================================
+   PAGE HEADER (Listing pages)
+   ============================================= */
+.page-header {
+  text-align: center;
+  padding: 4rem 1.5rem 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+
+.page-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* =============================================
+   LISTING SECTION
+   ============================================= */
+.listing-section {
+  padding: 2rem 1.5rem 4rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* =============================================
+   SECTION SUBTITLE & CTA (homepage previews)
+   ============================================= */
+.section-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: -1.5rem auto 2.5rem;
+  line-height: 1.7;
+}
+
+.guides-preview-section,
+.blog-preview-section {
+  padding: 4rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-cta {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+/* =============================================
    AD BANNERS
    ============================================= */
 .ad-banner-top {
@@ -1250,13 +1309,14 @@ main {
   .hero-stats { flex-direction: column; gap: 0.75rem; padding: 1rem; }
   .stat-divider { width: 40px; height: 1px; }
 
-  .features, .how-it-works, .demo-section, .guide-section, .blog-section, .cta-section {
+  .features, .how-it-works, .demo-section, .guide-section, .blog-section, .cta-section,
+  .guides-preview-section, .blog-preview-section, .listing-section {
     padding: 3rem 1rem;
   }
 
   .features-grid { grid-template-columns: 1fr; }
   .steps-grid { grid-template-columns: repeat(2, 1fr); }
-  .blog-grid { grid-template-columns: 1fr; }
+  .blog-grid { grid-template-columns: repeat(2, 1fr); }
 
   .demo-comparison { flex-direction: column; padding: 1.5rem; }
   .demo-arrow { transform: rotate(90deg); padding: 0; }
@@ -1273,6 +1333,7 @@ main {
 
 @media (max-width: 480px) {
   .steps-grid { grid-template-columns: 1fr; }
+  .blog-grid { grid-template-columns: 1fr; }
   .footer-links { flex-direction: column; gap: 0.5rem; }
 }
 
