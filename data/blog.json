@@ -1,0 +1,20 @@
+[
+  {
+    "title": "5 Secrets to Perfect AI Portrait Prompts",
+    "desc": "Learn the hidden techniques that professional prompt engineers use to create stunning, consistent AI portraits every time.",
+    "url": "/blog/portrait-prompt-secrets.html",
+    "icon": "🎨"
+  },
+  {
+    "title": "Midjourney vs Flux: Which Keeps Faces Better?",
+    "desc": "A detailed comparison of face consistency between Midjourney and Flux — which AI generator preserves identity better?",
+    "url": "/blog/midjourney-vs-flux.html",
+    "icon": "⚔️"
+  },
+  {
+    "title": "The Science Behind AI Face Recognition",
+    "desc": "How AI models 'see' faces and why understanding this helps you write better prompts for consistent results.",
+    "url": "/blog/face-recognition-science.html",
+    "icon": "🧬"
+  }
+]
