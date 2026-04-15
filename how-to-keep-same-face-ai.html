@@ -4,246 +4,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Keep the Same Face in AI Images | Complete Guide 2026</title>
-    <meta name="description"
-        content="Learn how to keep the same face in AI images with our expert guide. Master identity-preserving prompts for Midjourney, Flux, and Stable Diffusion to maintain perfect facial consistency.">
+    <title>How to Keep the Same Face in AI Images — What Is The Prompt?</title>
+    <meta name="description" content="Learn the exact techniques to preserve facial identity across every AI-generated image.">
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .blog-article { padding: 3rem 1.5rem 5rem; max-width: 720px; margin: 0 auto; }
+        .blog-article .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; transition: color 0.2s; }
+        .blog-article .back-link:hover { color: var(--accent-light); }
+        .blog-article h1 { font-family: 'Outfit', sans-serif; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; letter-spacing: -0.03em; margin-bottom: 1rem; line-height: 1.15; }
+        .blog-article .article-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2.5rem; display: flex; gap: 1rem; }
+        .blog-article .article-content h2 { font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; margin: 2.5rem 0 1rem; letter-spacing: -0.02em; }
+        .blog-article .article-content p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.25rem; }
+        .blog-article .article-content ul { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+        .blog-article .article-content li { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 0.5rem; }
+        .blog-article .article-content .tip-box { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: var(--r-lg); padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+        .blog-article .article-content .tip-box h4 { font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700; color: #a78bfa; margin-bottom: 0.5rem; }
+        .blog-article .article-content .tip-box p { margin-bottom: 0; }
+        .article-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; }
+        .article-nav a { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--accent-light); font-weight: 500; transition: color 0.2s; }
+        .article-nav a:hover { color: #fff; }
+    </style>
 </head>
-    
-    <body>
-    <!-- HEADER -->
-    <header class="header" id="header-section">
-        <a href="index.html" class="header-left">
-            <img src="logo.jpg" alt="What Is The Prompt?" class="logo-img" onerror="this.style.display='none'">
-            <span class="site-title">What Is The Prompt?</span>
+
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo">
+            <img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            <span class="logo-text">What Is The Prompt?</span>
         </a>
-        <div class="header-right" id="auth-container">
-            <button class="btn-google" id="header-login-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        <nav class="nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="generate.html" class="nav-link">Tool</a>
+            <a href="index.html#blog" class="nav-link active">Guide</a>
+        </nav>
+        <div class="header-actions">
+            <button class="btn-login" id="header-login-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05" />
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                 </svg>
-                Sign in
+                Login
             </button>
         </div>
     </header>
 
-    <main class="main-content" style="max-width:860px;">
-        <!-- HERO -->
-        <section class="hero-section">
-            <div class="hero-badge">✦ Complete Guide · AI Face Consistency</div>
-            <h1 class="hero-title">
-                How to Keep the Same<br>
-                <span class="gradient-text">Face in AI Images</span>
-            </h1>
-            <p class="hero-subtitle">
-                Master identity preserving AI techniques to maintain perfect AI face consistency across Midjourney, Flux, and Stable Diffusion. Stop wrestling with random faces and start generating recognizable characters every single time.
-            </p>
-            <a href="https://whatistheprompt.online" class="btn-primary" style="font-size:1rem; padding: 0.85rem 2rem;">
-                Generate your identity-locked prompt now
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
+    <main>
+        <article class="blog-article">
+            <a href="index.html#blog" class="back-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                Back to Guides
             </a>
-        </section>
-
-        <!-- WHY AI CHANGES FACES -->
-        <section class="tool-section">
-            <h2 class="section-title">
-                <span class="step-num">01</span>
-                Why AI Changes Faces
-            </h2>
-            <div style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.8;">
-                <p style="margin-bottom: 1rem;">If you've ever tried generating multiple images of the same person using AI, you've probably experienced the frustration of facial drift. You create one perfect portrait, tweak the prompt for a different pose or setting, and suddenly you're looking at a completely different person. This happens because of how generative AI fundamentally operates under the hood, and understanding this process is the first step toward mastering how to keep same face in AI images consistently.</p>
-                
-                <p style="margin-bottom: 1rem;">AI image generators like Midjourney, Stable Diffusion, and Flux use a process called latent diffusion. They start with random noise and gradually refine it into coherent imagery based on your text prompts and training data. The problem is that unless you specifically tell the AI to lock onto a particular facial identity, it treats each generation as an independent statistical probability. Every time you hit generate, the AI samples from a massive distribution of possible human faces, pulling features from millions of training images. Without proper constraints, you're essentially getting a new random face with every generation.</p>
-                
-                <p style="margin-bottom: 1rem;">Text prompts alone are notoriously poor at describing precise facial topology. You can write "blue eyes and brown hair" and the AI will comply, but those descriptors apply to millions of people. Language lacks the mathematical precision to convey exact interocular distance, nasal bridge width, cheekbone prominence, or jawline angulation. When you ask for "the same woman in a different outfit," the AI interprets that as a conceptual similarity rather than biometric identity preservation. It thinks you want someone who fits the general description, not the exact same biometric individual.</p>
-                
-                <p>Additionally, style modifiers often override facial consistency. When you add "oil painting," "cinematic lighting," or "anime style" to your prompt, the AI prioritizes these aesthetic transformations over structural preservation. The diffusion process treats facial features as malleable elements to be reinterpreted through your requested artistic lens. This is why maintaining AI face consistency becomes exponentially harder when you're working across different artistic styles or lighting conditions without proper identity preserving AI workflows in place.</p>
-            </div>
-        </section>
-
-        <!-- WHY MOST PROMPTS FAIL -->
-        <section class="tool-section">
-            <h2 class="section-title">
-                <span class="step-num">02</span>
-                Why Most Prompts Fail
-            </h2>
-            <div style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.8;">
-                <p style="margin-bottom: 1rem;">The internet is full of prompt engineering advice that promises consistent characters, yet most creators still struggle with facial drift. That's because common approaches contain fundamental flaws that undermine identity preservation from the start. The most widespread mistake is relying exclusively on detailed text descriptions without visual references. While writing lengthy character sheets helps with clothing and general appearance, text alone cannot encode the geometric precision required for facial replication.</p>
-                
-                <p style="margin-bottom: 1rem;">Many users attempt to solve consistency through celebrity name dropping, writing prompts like "looks like Scarlett Johansson" or "resembling Ryan Gosling." This approach fails for multiple reasons. First, these references pull generic archetypes from training data rather than specific biometric markers. Second, they introduce copyright and right-of-publicity risks. Third, celebrity references often trigger the AI's safety filters or style biases, producing homogenized approximations rather than the specific identity you're trying to maintain. You're essentially fighting against the AI's tendency to generalize.</p>
-                
-                <p style="margin-bottom: 1rem;">Another critical failure involves neglecting seed values and randomization. Every AI generation uses a random seed that initializes the diffusion noise pattern. If you don't lock this seed, each generation starts from a completely different mathematical foundation, guaranteeing facial variation regardless of prompt similarity. Many creators don't even know seeds exist, or they assume prompt similarity will naturally lead to facial similarity. In reality, uncontrolled randomization is the enemy of consistency when learning how to keep same face in AI images across multiple generations.</p>
-                
-                <p style="margin-bottom: 1rem;">Negative prompts are frequently overlooked, yet they're essential guardrails for facial consistency. Standard positive prompts tell the AI what to include, but without negative constraints specifying what to exclude—such as aging, different hair colors, glasses, facial hair, makeup changes, or expression variations—the AI freely introduces modifications between generations. Each generation might add slight variations that compound over time, turning your consistent character into someone unrecognizable by the tenth image.</p>
-                
-                <p>Finally, resolution and aspect ratio inconsistency destroys facial identity. Facial proportions change dramatically between square, portrait, and landscape orientations as the AI attempts to fill frame space. When you switch between 1:1 and 16:9 ratios for the same character, the AI often produces distorted or unrecognizable facial features because it's trying to composite the same face into different spatial constraints. Without maintaining consistent framing, your identity preserving AI workflow breaks down regardless of how good your prompts are.</p>
-            </div>
-        </section>
-
-        <!-- STEP-BY-STEP METHOD -->
-        <div class="how-it-works" style="margin-top: 3rem;">
-            <h2>Step-by-Step Method to Keep Same Face</h2>
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; max-width: 600px; margin: -1rem auto 2rem; line-height: 1.6;">
-                Follow this proven workflow to achieve perfect AI face consistency using identity preserving AI techniques that professional creators rely on for character continuity.
-            </p>
-            
-            <!-- H3: Use a Strong Reference Image -->
-            <div class="step-card" style="margin-bottom: 1rem;">
-                <div class="step-number">1</div>
-                <h3>Use a Strong Reference Image</h3>
-                <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); margin-top: 0.5rem;">
-                    The foundation of how to keep same face in AI images begins with your reference material. You need high-quality source photos that clearly show the target face from optimal angles. The reference image acts as an anchor that grounds the AI to specific biometric data rather than letting it sample randomly from its training distribution. For best results, use front-facing or slightly angled portraits with good lighting, minimal shadows, and unobstructed facial features. Avoid sunglasses, heavy makeup changes, or extreme angles in your primary reference.
-                </p>
-                <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); margin-top: 0.75rem;">
-                    Modern identity preserving AI workflows utilize technologies like IP-Adapter (Image Prompt Adapter) in Stable Diffusion or the Character Reference (--cref) parameter in Midjourney v6. These systems analyze your reference and create facial embeddings—mathematical representations of unique facial topology—that guide the generation process. The stronger your reference image, the more accurate these embeddings become. Think of it like giving the AI a driver's license photo rather than a blurry group shot. Tools like <a href="https://whatistheprompt.online" style="color: var(--indigo); text-decoration: underline;">What Is The Prompt?</a> can analyze your reference photos using Llama 4 Vision to extract the precise descriptive tokens that act as hard constraints for AI models, essentially translating your image into the exact language that locks facial identity.
-                </p>
+            <h1>How to Keep the Same Face in AI Images</h1>
+            <div class="article-meta">
+                <span>5 min read</span>
+                <span>·</span>
+                <span>Beginner Friendly</span>
             </div>
 
-            <!-- H3: Lock Facial Identity in Prompt -->
-            <div class="step-card" style="margin-bottom: 1rem;">
-                <div class="step-number">2</div>
-                <h3>Lock Facial Identity in Prompt</h3>
-                <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); margin-top: 0.5rem;">
-                    Once you have strong references, you need to translate facial features into precise prompt language. Generic descriptions like "beautiful woman" or "handsome man" describe millions of people and provide zero identity anchoring. Instead, you must use geometric, specific terminology that constrains the AI to exact facial proportions. Describe almond-shaped eyes versus round eyes, specify the distance between features, reference nasal bridge width, mention cheekbone prominence, and detail jawline angulation.
-                </p>
-                <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); margin-top: 0.75rem;">
-                    The structure of your prompt matters immensely for AI face consistency. Place identity keywords at the beginning of your prompt where they carry more weight in the AI's attention mechanism. Use phrases like "exactly the same face," "identical facial features," or "consistent identity" to signal to the AI that preservation is mandatory, not optional. Combine these with identity preserving AI tools that automatically generate optimized prompt syntax. These advanced systems don't just describe faces—they encode facial feature vectors into token sequences that AI image generators interpret as non-negotiable identity constraints. This approach transforms vague descriptions into mathematical certainties, ensuring your character's face remains locked across dozens of generations.
-                </p>
+            <div class="article-content">
+                <p>One of the biggest frustrations with AI image generation is that the face changes every time you generate a new image. Even with the same prompt, AI models like Midjourney, Stable Diffusion, and Flux produce completely different faces. Here's how to fix that.</p>
+
+                <h2>Why Does AI Change the Face?</h2>
+                <p>AI image generators don't have a memory of "who" the person is. Each generation starts from random noise. The prompt guides the overall style and composition, but without explicit face-lock instructions, the AI fills in facial details randomly every time.</p>
+
+                <h2>The Solution: Identity-Preserving Prompts</h2>
+                <p>The key is to describe the face with forensic-level precision. Instead of saying "a woman with brown hair," you need to describe every facial feature in detail:</p>
+
+                <ul>
+                    <li>Face shape (oval, round, angular, heart-shaped)</li>
+                    <li>Eye shape, size, and exact iris color</li>
+                    <li>Nose bridge height and tip shape</li>
+                    <li>Lip shape, fullness, and natural color</li>
+                    <li>Jawline definition and chin shape</li>
+                    <li>Cheekbone prominence</li>
+                    <li>Skin tone and undertone in specific lighting</li>
+                    <li>Any unique features (moles, freckles, asymmetries)</li>
+                </ul>
+
+                <div class="tip-box">
+                    <h4>💡 Pro Tip</h4>
+                    <p>Our tool automatically analyzes your uploaded photo and generates an identity-preserving prompt with all these details — including a mandatory face lock statement at the end.</p>
+                </div>
+
+                <h2>Use Reference Images</h2>
+                <p>Most AI tools support reference images. In Midjourney, use the <code>--cref</code> (character reference) parameter. In Flux, use IP-Adapter. In Stable Diffusion, use ControlNet with a face reference. These tools anchor the AI's generation to your reference face.</p>
+
+                <h2>The Face Lock Statement</h2>
+                <p>Every prompt generated by our tool ends with a mandatory face lock statement that explicitly instructs the AI to preserve the exact facial geometry of the reference photo. This is the most critical part of keeping the same face across generations.</p>
+
+                <h2>Consistency Tips</h2>
+                <ul>
+                    <li>Always use the same reference photo</li>
+                    <li>Keep the core prompt identical between generations</li>
+                    <li>Only change the background or clothing, not the face description</li>
+                    <li>Use a high-quality, well-lit reference photo</li>
+                    <li>Avoid extreme angles in your reference image</li>
+                </ul>
+
+                <div class="tip-box">
+                    <h4>🚀 Try It Now</h4>
+                    <p>Upload a portrait photo to our free tool and get a production-grade, identity-preserving prompt in under 30 seconds.</p>
+                </div>
             </div>
 
-            <!-- H3: Keep Camera & Lighting Consistent -->
-            <div class="step-card" style="margin-bottom: 1rem;">
-                <div class="step-number">3</div>
-                <h3>Keep Camera & Lighting Consistent</h3>
-                <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); margin-top: 0.5rem;">
-                    Facial recognition isn't just about features—it's about how light interacts with those features. When you change lighting setups dramatically between generations, shadows fall differently across the face, highlighting different bone structures and creating the illusion of facial change even when the underlying geometry remains constant. To maintain true consistency, establish a baseline lighting description and modify it gradually rather than completely changing it between images.
-                </p>
-                <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); margin-top: 0.75rem;">
-                    Camera distance and focal length also impact perceived facial identity. Wide-angle lenses distort faces differently than telephoto lenses. If your reference uses an 85mm portrait lens simulation but your next generation uses a 24mm wide-angle, the facial proportions will appear different even if the AI is technically generating the same person. Specify consistent camera parameters in your prompts: "85mm lens," "f/1.8," "portrait distance." This technical consistency ensures that how to keep same face in AI images isn't undermined by optical physics. Additionally, maintain consistent seed values across generations when possible. Fixed seeds initialize the diffusion process with identical noise patterns, dramatically reducing the random variation that typically causes facial drift. In Stable Diffusion, enable "Fixed Seed"; in Midjourney, use --seed [number] consistently.
-                </p>
-            </div>
-        </div>
-
-        <!-- BEST SOLUTION -->
-        <section class="tool-section" style="margin-top: 3rem;">
-            <h2 class="section-title">
-                <span class="step-num">03</span>
-                Best Solution for Perfect Face Consistency
-            </h2>
-            <div style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.8;">
-                <p style="margin-bottom: 1rem;">While manual prompt engineering can achieve reasonable consistency, the most reliable approach to AI face consistency involves leveraging specialized tools designed specifically for identity preservation. Professional creators and agencies don't waste hours tweaking prompts through trial and error—they use intelligent systems that analyze reference photographs and generate production-grade, identity-locked prompts automatically.</p>
-                
-                <p style="margin-bottom: 1rem;">The optimal workflow combines computer vision analysis with advanced language models to bridge the gap between visual references and text-based generation. Rather than guessing which descriptors will lock facial identity, these systems extract precise biometric data from your reference images and encode them into prompt syntax that AI generators cannot misinterpret. This eliminates the ambiguity of natural language and replaces it with mathematical precision.</p>
-                
-                <p style="margin-bottom: 1rem;">For creators serious about character consistency, <a href="https://whatistheprompt.online" style="color: var(--indigo); text-decoration: underline;">What Is The Prompt?</a> offers the most advanced identity preserving AI solution available. The platform uses Llama 4 Vision to perform deep analysis of your reference photos, identifying specific facial landmarks, proportions, and unique identifiers that human-written prompts typically miss. It then composes DSLR-grade prompts optimized for Midjourney, Flux, and SDXL that treat facial identity as the primary constraint rather than an afterthought.</p>
-                
-                <p>This approach delivers consistent results in 1-2 generations rather than 20-50, saving computational costs and creative time. Whether you're developing a visual novel, creating marketing materials with consistent brand ambassadors, or building a portfolio of character art, automated identity locking transforms an frustrating guessing game into a reliable production pipeline. The technology handles the complex mathematics of facial embedding extraction and prompt optimization, allowing you to focus on creativity rather than wrestling with randomization.</p>
-            </div>
-            
-            <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid var(--border-accent); border-radius: var(--r-lg); padding: 1.5rem; margin-top: 1.5rem; text-align: center;">
-                <p style="color: var(--text-primary); font-family: 'Outfit', sans-serif; font-weight: 600; margin-bottom: 0.5rem;">Ready to lock your character's identity?</p>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Upload your reference photo and get an identity-preserving prompt in seconds.</p>
-                <a href="https://whatistheprompt.online" class="btn-primary">
-                    Generate your identity-locked prompt now
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
+            <div class="article-nav">
+                <a href="ai-face-consistency-guide.html">
+                    Next: AI Face Consistency Guide
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                </a>
+                <a href="index.html#blog">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                    All Guides
                 </a>
             </div>
-        </section>
-
-        <!-- FINAL TIPS -->
-        <section class="tool-section" style="margin-top: 3rem;">
-            <h2 class="section-title">
-                <span class="step-num">04</span>
-                Final Tips for Long-Term Consistency
-            </h2>
-            <div style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.8;">
-                <p style="margin-bottom: 1rem;">Achieving perfect identity preserving AI results requires ongoing attention to detail beyond the initial setup. As you generate multiple images of the same character across different scenarios, maintain a "character bible"—a document containing your locked seed numbers, exact prompt phrases that work, and reference image URLs. This documentation prevents drift over time and ensures that months later, you can recreate the exact same face for sequel content or campaign extensions.</p>
-                
-                <p style="margin-bottom: 1rem;">When working with different AI models, understand that each handles identity preservation differently. Midjourney v6's Character Reference feature works differently than Stable Diffusion's IP-Adapter or Flux's native consistency tools. Don't expect prompts optimized for one platform to translate perfectly to another. Each ecosystem has unique syntax and capabilities for AI face consistency. Take time to learn the specific identity-preserving parameters for your chosen platform, whether that's --cref and --sref in Midjourney, ControlNet face models in Stable Diffusion, or prompt weighting techniques in Flux.</p>
-                
-                <p style="margin-bottom: 1rem;">Be cautious with extreme emotional expressions or angles. While modern AI can maintain identity across smiling, neutral, and frowning expressions, extreme poses (full profile shots, extreme low angles, or top-down views) challenge the model's ability to recognize and preserve facial topology. When you need these extreme angles, generate them in batches using the same seed and reference, then select the closest match rather than accepting high variation.</p>
-                
-                <p style="margin-bottom: 1rem;">Regularly validate your consistency by comparing new generations side-by-side with your original reference. Facial drift happens gradually—subtle changes compound over ten generations until you suddenly realize your character looks like a different person. Establish checkpoints where you verify that eyes, nose shape, and facial structure remain identical to your baseline. If you notice drift, return to your documented seed and prompt settings rather than trying to correct forward from the drifted image.</p>
-                
-                <p>Finally, remember that background and clothing changes should never compromise facial identity. Use inpainting or masked generation when you want to change outfits or environments while keeping the face exactly identical. This technique isolates the facial region, preventing the AI from "hallucinating" facial changes while modifying surrounding elements. Combined with strong reference images and optimized prompts, these advanced techniques ensure you never have to wonder how to keep same face in AI images again—you'll have a bulletproof system for consistent character generation every time.</p>
-            </div>
-        </section>
-
-        <!-- BOTTOM CTA -->
-        <section class="hero-section" style="padding: 4rem 0; margin-top: 3rem; background: var(--bg-card); border-radius: var(--r-xl); border: 1px solid var(--border);">
-            <div class="hero-badge">✦ Start Creating Consistent Characters</div>
-            <h2 class="hero-title" style="font-size: clamp(1.8rem, 5vw, 2.8rem);">
-                Stop the Face-Changing<br>
-                <span class="gradient-text">Frustration Today</span>
-            </h2>
-            <p class="hero-subtitle" style="max-width: 540px;">
-                Join thousands of creators who use identity-locked prompts to maintain perfect facial consistency. Upload your reference and generate production-ready prompts for Midjourney, Flux, and SDXL.
-            </p>
-            <a href="https://whatistheprompt.online" class="btn-primary" style="font-size:1rem; padding: 0.85rem 2rem;">
-                Generate your identity-locked prompt now
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </a>
-        </section>
-
-        <!-- AD SPACE -->
-        <div class="ad-container ad-banner" id="content-ad-banner" style="margin: 2.5rem auto 0;">
-            <script>
-                (function () {
-                    var w = window.innerWidth || document.documentElement.clientWidth;
-                    if (w >= 728) {
-                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
-                    } else if (w >= 468) {
-                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 60, 'width': 468, 'params': {} };
-                    } else {
-                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
-                    }
-                })();
-            </script>
-            <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
-        </div>
+        </article>
     </main>
 
-    <!-- FOOTER -->
     <footer class="footer">
-        <p class="footer-text">&copy; 2026 What Is The Prompt? &nbsp;·&nbsp; 5 free generations per day &nbsp;·&nbsp; <a href="index.html" style="color: var(--text-muted); text-decoration: underline;">Home</a></p>
-        <div class="ad-container ad-banner" id="footer-ad-banner" style="margin: 0.875rem auto 0;">
-            <script>
-                (function () {
-                    var w = window.innerWidth || document.documentElement.clientWidth;
-                    if (w >= 728) {
-                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
-                    } else if (w >= 468) {
-                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 60, 'width': 468, 'params': {} };
-                    } else {
-                        atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
-                    }
-                })();
-            </script>
-            <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="generate.html">Tool</a>
+                <a href="index.html#blog">Guide</a>
+            </div>
+            <p class="copyright">&copy; 2026 What Is The Prompt? — Powered by Groq + Llama 4</p>
+        </div>
+        <div class="ad-banner-footer">
+            <div class="ad-container" id="footer-ad-banner">
+                <script>
+                    (function () {
+                        var w = window.innerWidth || document.documentElement.clientWidth;
+                        if (w >= 728) {
+                            atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
+                        } else if (w >= 468) {
+                            atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 60, 'width': 468, 'params': {} };
+                        } else {
+                            atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
+                        }
+                    })();
+                </script>
+                <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
+            </div>
         </div>
     </footer>
 
-    <!-- Mobile sticky bottom banner ad (320x50) -->
-    <div class="ad-sticky-bottom-mobile" id="mobile-sticky-ad">
-        <script>
-            atOptions = { 'key': '7b616e0dce6848244919663e545f774d', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
-        </script>
-        <script src="https://www.highperformanceformat.com/7b616e0dce6848244919663e545f774d/invoke.js"></script>
-    </div>
+    <script type="module" src="js/script.js"></script>
 </body>
 
 </html>
