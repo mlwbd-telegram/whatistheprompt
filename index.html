@@ -20,14 +20,15 @@
 
     <!-- ═══════════════ HEADER ═══════════════ -->
     <header class="header">
-        <a href="index.html" class="logo">
+        <a href="/" class="logo">
             <img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'">
             <span class="logo-text">What Is The Prompt?</span>
         </a>
         <nav class="nav">
-            <a href="index.html" class="nav-link active">Home</a>
+            <a href="/" class="nav-link active">Home</a>
             <a href="generate.html" class="nav-link">Tool</a>
-            <a href="#blog" class="nav-link">Guide</a>
+            <a href="guides.html" class="nav-link">Guides</a>
+            <a href="blog.html" class="nav-link">Blog</a>
         </nav>
         <div class="header-actions">
             <button class="btn-login" id="header-login-btn">
@@ -83,8 +84,8 @@
                     </svg>
                     Start Generating — It's Free
                 </a>
-                <a href="#blog" class="btn btn-ghost">
-                    Learn More
+                <a href="guides.html" class="btn btn-ghost">
+                    Explore Guides
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M6 9l6 6 6-6" />
                     </svg>
@@ -164,68 +165,31 @@
             </div>
         </section>
 
-        <!-- ═══════════════ BLOG SECTION ═══════════════ -->
-        <section class="blog-section" id="blog">
-            <h2 class="section-title text-center">Learn &amp; Master <span class="gradient-text">AI Prompting</span></h2>
-            <p class="blog-subtitle">Learn how to keep the same face in AI images and improve AI results.</p>
-            <div class="blog-grid">
-
-                <!-- Blog Card 1 -->
-                <article class="blog-card glass">
-                    <div class="blog-card-icon">🎭</div>
-                    <div class="blog-card-body">
-                        <h3>How to Keep the Same Face in AI Images</h3>
-                        <p>Discover the exact techniques to preserve facial identity across every AI-generated image — from Midjourney to Flux.</p>
-                        <a href="how-to-keep-same-face-ai.html" class="btn btn-sm btn-ghost">
-                            Read More
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Blog Card 2 -->
-                <article class="blog-card glass">
-                    <div class="blog-card-icon">📐</div>
-                    <div class="blog-card-body">
-                        <h3>AI Face Consistency Guide</h3>
-                        <p>Master the art of face consistency across AI-generated portraits. Learn prompt engineering secrets professionals use.</p>
-                        <a href="ai-face-consistency-guide.html" class="btn btn-sm btn-ghost">
-                            Read More
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Blog Card 3 -->
-                <article class="blog-card glass">
-                    <div class="blog-card-icon">✍️</div>
-                    <div class="blog-card-body">
-                        <h3>Best Prompt for Same Face AI</h3>
-                        <p>Get the best prompt templates that guarantee the same face appears in every AI-generated image — copy and paste ready.</p>
-                        <a href="best-prompt-same-face-ai.html" class="btn btn-sm btn-ghost">
-                            Read More
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Blog Card 4 -->
-                <article class="blog-card glass">
-                    <div class="blog-card-icon">🔍</div>
-                    <div class="blog-card-body">
-                        <h3>Why AI Changes Faces</h3>
-                        <p>Understand why AI alters faces between generations and how to fix it with the right prompt structure and identity locks.</p>
-                        <a href="why-ai-changes-faces.html" class="btn btn-sm btn-ghost">
-                            Read More
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        </a>
-                    </div>
-                </article>
-
+        <!-- ═══════════════ GUIDES PREVIEW SECTION ═══════════════ -->
+        <section class="guides-preview-section" id="guides-preview">
+            <h2 class="section-title text-center">Popular <span class="gradient-text">Guides</span></h2>
+            <p class="section-subtitle text-center">Step-by-step guides to master AI prompting and face consistency.</p>
+            <div class="blog-grid" id="home-guides-preview">
+                <!-- Cards loaded dynamically by loader.js -->
             </div>
-            <div class="blog-cta">
-                <a href="#blog" class="btn btn-primary btn-glow">
+            <div class="section-cta">
+                <a href="guides.html" class="btn btn-primary btn-glow">
                     Explore All Guides
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- ═══════════════ BLOG PREVIEW SECTION ═══════════════ -->
+        <section class="blog-preview-section" id="blog-preview">
+            <h2 class="section-title text-center">Latest from the <span class="gradient-text">Blog</span></h2>
+            <p class="section-subtitle text-center">Tips, deep dives, and insights on AI image generation.</p>
+            <div class="blog-grid" id="home-blog-preview">
+                <!-- Cards loaded dynamically by loader.js -->
+            </div>
+            <div class="section-cta">
+                <a href="blog.html" class="btn btn-primary btn-glow">
+                    View Blog
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </a>
             </div>
@@ -251,9 +215,10 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="index.html">Home</a>
+                <a href="/">Home</a>
                 <a href="generate.html">Tool</a>
-                <a href="#blog">Guide</a>
+                <a href="guides.html">Guides</a>
+                <a href="blog.html">Blog</a>
             </div>
             <p class="copyright">&copy; 2026 What Is The Prompt? — Powered by Groq + Llama 4</p>
         </div>
@@ -277,6 +242,8 @@
     </footer>
 
     <script type="module" src="js/script.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/ad-refresh.js" defer></script>
 </body>
 
 </html>
