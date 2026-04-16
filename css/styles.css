@@ -631,6 +631,7 @@ main {
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), transparent);
   opacity: 0;
   transition: opacity 0.3s;
+  pointer-events: none; /* FIX: allow clicks to pass through */
 }
 
 .blog-card:hover::before { opacity: 1; }
