@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,25 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
-    <style>
-        .blog-article { padding: 3rem 1.5rem 5rem; max-width: 720px; margin: 0 auto; }
-        .blog-article .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; transition: color 0.2s; }
-        .blog-article .back-link:hover { color: var(--accent-light); }
-        .blog-article h1 { font-family: 'Outfit', sans-serif; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; letter-spacing: -0.03em; margin-bottom: 1rem; line-height: 1.15; }
-        .blog-article .article-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2.5rem; display: flex; gap: 1rem; }
-        .blog-article .article-content h2 { font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; margin: 2.5rem 0 1rem; letter-spacing: -0.02em; }
-        .blog-article .article-content p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.25rem; }
-        .blog-article .article-content ul { padding-left: 1.5rem; margin-bottom: 1.25rem; }
-        .blog-article .article-content li { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 0.5rem; }
-        .blog-article .article-content .tip-box { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: var(--r-lg); padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
-        .blog-article .article-content .tip-box h4 { font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700; color: #a78bfa; margin-bottom: 0.5rem; }
-        .blog-article .article-content .tip-box p { margin-bottom: 0; }
-        .article-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; }
-        .article-nav a { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--accent-light); font-weight: 500; transition: color 0.2s; }
-        .article-nav a:hover { color: #fff; }
-    </style>
 </head>
-
 <body>
 
     <header class="header">
@@ -40,93 +21,82 @@
         <nav class="nav">
             <a href="/index.html" class="nav-link">Home</a>
             <a href="/generate.html" class="nav-link">Tool</a>
-            <a href="/index.html#blog" class="nav-link active">Guide</a>
+            <a href="/guides.html" class="nav-link active">Guides</a>
+            <a href="/blog.html" class="nav-link">Blog</a>
         </nav>
         <div class="header-actions">
             <button class="btn-login" id="header-login-btn">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05" />
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
                 Login
+            </button>
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+                <span></span><span></span><span></span>
             </button>
         </div>
     </header>
 
-    <main>
-        <article class="blog-article">
-            <a href="/index.html#blog" class="back-link">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
-                Back to Guides
-            </a>
-            <h1>Why AI Changes Faces Between Generations</h1>
-            <div class="article-meta">
-                <span>5 min read</span>
-                <span>·</span>
-                <span>Beginner Friendly</span>
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="/index.html" class="nav-link">Home</a>
+        <a href="/generate.html" class="nav-link">Tool</a>
+        <a href="/guides.html" class="nav-link active">Guides</a>
+        <a href="/blog.html" class="nav-link">Blog</a>
+    </nav>
+
+    <main class="blog-article">
+        <a href="/guides.html" class="back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Guides
+        </a>
+
+        <h1>Why AI Changes Faces</h1>
+        <div class="article-meta">
+            <span>Guide</span><span>·</span><span>5 min read</span>
+        </div>
+
+        <div class="article-content">
+            <p>If you've generated two AI images with the same prompt and gotten two completely different faces, you're not doing anything wrong. This is actually how AI image generators work by design — and understanding why is the key to fixing it.</p>
+
+            <h2>The Randomness Problem</h2>
+            <p>Every AI image generation starts with a canvas of pure random noise — like TV static. The AI then gradually removes noise, guided by your text prompt. But since the starting noise is random, each generation begins from a different point.</p>
+            <p>Even with an identical prompt, different starting noise produces different results. This is especially true for faces, which have the most variation potential.</p>
+
+            <h2>How AI "Sees" Your Prompt</h2>
+            <p>AI models don't read prompts like humans. They convert text into numerical vectors (called embeddings) that guide the denoising process. When you write "a woman with brown hair," the AI interprets this broadly — there are millions of possible "woman with brown hair" faces in its training data.</p>
+            <p>Without specific constraints, the AI picks a random interpretation each time.</p>
+
+            <h2>The Fix: Constraint Through Specificity</h2>
+            <ul>
+                <li><strong>Instead of</strong> "brown eyes" <strong>use</strong> "warm dark-brown almond-shaped eyes with a slight upward tilt at the outer corners"</li>
+                <li><strong>Instead of</strong> "nice smile" <strong>use</strong> "a gentle closed-mouth smile with a small dimple on the right cheek"</li>
+                <li><strong>Instead of</strong> "nice face" <strong>use</strong> "oval face shape with high defined cheekbones, a straight nose bridge, and balanced facial proportions"</li>
+            </ul>
+
+            <div class="tip-box">
+                <h4>💡 The Specificity Paradox</h4>
+                <p>The more detailed your description, the more consistent the results. Short prompts create random faces. Long, precise prompts lock identity.</p>
             </div>
 
-            <div class="article-content">
-                <p>You upload the same prompt twice and get two completely different faces. This is the #1 frustration with AI image generation. But understanding <em>why</em> this happens is the first step to fixing it.</p>
+            <h2>Why Our Tool Works</h2>
+            <p>Our AI analyzes your uploaded photo and extracts every measurable facial attribute — producing a 400–600 word prompt packed with identity-preserving constraints. This level of detail is nearly impossible to write manually, but our tool generates it automatically.</p>
 
-                <h2>Random Noise Is the Root Cause</h2>
-                <p>Every AI image starts as pure random noise — like TV static. The AI then gradually removes the noise while following your prompt as a guide. But the noise is different every time, and your prompt doesn't specify every pixel. So the AI fills in the gaps differently each generation.</p>
+            <h2>Bonus Techniques</h2>
+            <ul>
+                <li>Use the same seed number across generations when your generator supports it</li>
+                <li>Midjourney's --cref flag provides additional face consistency</li>
+                <li>IP-Adapter and ReActor for Stable Diffusion can enforce face similarity</li>
+                <li>Always keep lighting descriptions consistent — lighting changes perceived face shape</li>
+            </ul>
+        </div>
 
-                <h2>Why Simple Prompts Fail</h2>
-                <p>A prompt like "a young woman with brown hair smiling" gives the AI almost no facial information. The AI has to invent:</p>
-                <ul>
-                    <li>Face shape and bone structure</li>
-                    <li>Exact eye shape and color</li>
-                    <li>Nose shape and size</li>
-                    <li>Lip shape and fullness</li>
-                    <li>Jawline and chin structure</li>
-                    <li>Skin tone and texture</li>
-                    <li>Every unique facial feature</li>
-                </ul>
-                <p>With 100+ details left unspecified, the AI guesses randomly every time — producing a different face each generation.</p>
-
-                <h2>How AI Models "Think" About Faces</h2>
-                <p>AI models are trained on billions of images. When you give a vague prompt, they don't pick one specific face — they generate an <em>average</em> of all the faces they've seen that match your description. That average is different each time because of the random starting noise.</p>
-
-                <div class="tip-box">
-                    <h4>🧠 Key Insight</h4>
-                    <p>The AI doesn't know "who" the person is. It only knows what words you give it. The more specific your facial description, the less room there is for random variation.</p>
-                </div>
-
-                <h2>The Solution: Specify Everything</h2>
-                <p>To keep the same face, you must describe every facial feature with forensic precision. When your prompt specifies 200+ facial details, there's almost no room for the AI to invent anything new. The face becomes locked by the specificity of your description.</p>
-
-                <h2>Reference Images Are Essential</h2>
-                <p>Even the best prompt can't beat an actual image reference. That's why tools like Midjourney's <code>--cref</code>, Flux's IP-Adapter, and Stable Diffusion's ControlNet exist — they give the AI an actual face to reference, not just words.</p>
-
-                <h2>The Complete Fix</h2>
-                <p>Combine both approaches for maximum consistency:</p>
-                <ul>
-                    <li><strong>Detailed prompt:</strong> Describe every facial feature with precision</li>
-                    <li><strong>Face lock statement:</strong> Explicitly instruct the AI to preserve the reference face</li>
-                    <li><strong>Reference image:</strong> Use the platform's image reference feature</li>
-                    <li><strong>Same seed:</strong> When possible, keep the seed number identical</li>
-                </ul>
-
-                <div class="tip-box">
-                    <h4>🚀 Do It All Automatically</h4>
-                    <p>Our tool analyzes your photo, extracts 200+ facial details, generates a complete prompt with face lock, and gives you everything ready to paste into any AI generator. Free — 5 generations per day.</p>
-                </div>
-            </div>
-
-            <div class="article-nav">
-                <a href="best-prompt-same-face-ai.html">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
-                    Previous: Best Prompt Templates
-                </a>
-                <a href="/index.html#blog">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                    All Guides
-                </a>
-            </div>
-        </article>
+        <nav class="article-nav">
+            <a href="/guides.html">← All Guides</a>
+            <a href="/generate.html">Try the Tool →</a>
+        </nav>
     </main>
 
     <footer class="footer">
@@ -134,7 +104,8 @@
             <div class="footer-links">
                 <a href="/index.html">Home</a>
                 <a href="/generate.html">Tool</a>
-                <a href="/index.html#blog">Guide</a>
+                <a href="/guides.html">Guides</a>
+                <a href="/blog.html">Blog</a>
             </div>
             <p class="copyright">&copy; 2026 What Is The Prompt? — Powered by Groq + Llama 4</p>
         </div>
@@ -143,7 +114,7 @@
         </div>
     </footer>
 
-    <script type="module" src="/js/script.js"></script>
+    <script src="/js/nav.js"></script>
+    <script src="/js/ad-refresh.js" defer></script>
 </body>
-
 </html>
