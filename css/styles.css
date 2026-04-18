@@ -621,7 +621,10 @@ main {
   cursor: pointer;
   position: relative;
   animation: fadein 0.5s var(--ease) both;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
 }
+
+/* pointer-events removed — card click handled by loader.js onclick */
 
 .blog-card::before {
   content: '';
@@ -1045,10 +1048,18 @@ main {
   justify-content: center;
   overflow: hidden;
   width: 100%;
-  max-width: 728px;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-.ad-container iframe,
+.ad-container iframe {
+  max-width: 100% !important;
+  height: auto !important;
+  border: none;
+  display: block;
+}
+
 .ad-container ins,
 .ad-container > * {
   max-width: 100% !important;
