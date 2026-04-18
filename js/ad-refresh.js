@@ -10,7 +10,7 @@
     'use strict';
 
     var REFRESH_MS = 60000;               // 60 seconds
-    var BANNER_SRC = 'ads/banner.html';   // responsive banner
+    var BANNER_SRC = '/ads/banner.html';   // responsive banner (absolute path)
 
     // Only top + footer banner slots remain
     var SLOTS = [
@@ -33,6 +33,7 @@
             iframe.height = String(slot.h);
             iframe.frameBorder = '0';
             iframe.scrolling = 'no';
+            iframe.sandbox = 'allow-scripts allow-same-origin';
             iframe.style.cssText = 'display:block;border:none;max-width:100%;';
             el.appendChild(iframe);
         }
