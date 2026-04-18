@@ -1,31 +1,7 @@
 /**
  * loader.js — Dynamic content card rendering engine
  * Fetches JSON data and renders cards into target containers.
- * Works on any deployment: root domain, subpath (GitHub Pages), Netlify, etc.
  */
-
-/**
- * Resolve the site root path by reading this script's own src URL.
- * Works regardless of deployment subpath.
- */
-function getBasePath() {
-  // Try document.currentScript first (most reliable, synchronous)
-  var self = document.currentScript;
-  if (self && self.src) {
-    return new URL(self.src).pathname.replace(/js\/loader\.js(\?.*)?$/, '');
-  }
-  // Fallback: scan all scripts
-  var scripts = document.querySelectorAll('script[src]');
-  for (var i = 0; i < scripts.length; i++) {
-    if (scripts[i].src && scripts[i].src.indexOf('loader.js') !== -1) {
-      return new URL(scripts[i].src).pathname.replace(/js\/loader\.js(\?.*)?$/, '');
-    }
-  }
-  return '/';
-}
-
-// Capture base path at parse time (before DOMContentLoaded)
-var SITE_BASE = getBasePath();
 
 function loadCards(options) {
   var dataUrl = options.dataUrl;
@@ -46,9 +22,7 @@ function loadCards(options) {
       'Loading content\u2026' +
     '</div>';
 
-  var resolvedUrl = SITE_BASE + dataUrl;
-
-  fetch(resolvedUrl)
+  fetch(dataUrl)
     .then(function(res) {
       if (!res.ok) throw new Error('HTTP ' + res.status + ' \u2014 ' + res.statusText);
       return res.json();
@@ -74,26 +48,37 @@ function loadCards(options) {
         var title = escapeHtml(item.title || 'Untitled');
         var desc = escapeHtml(item.desc || '');
 
-        // Resolve card URLs relative to site root
-        var rawUrl = item.url || '#';
-        var url = rawUrl === '#' ? '#' : SITE_BASE + rawUrl.replace(/^\//, '');
+        // Use URL directly — JSON URLs are already absolute paths from root
+        var url = item.url || '#';
+
+        // Store URL on card for click navigation
+        card.setAttribute('data-url', url);
 
         card.innerHTML =
           '<div class="blog-card-icon">' + icon + '</div>' +
           '<div class="blog-card-body">' +
             '<h3>' + title + '</h3>' +
             '<p>' + desc + '</p>' +
-            '<a href="' + url + '" class="btn btn-sm btn-ghost">' +
+            '<span class="btn btn-sm btn-ghost">' +
               'Read More ' +
               '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
-            '</a>' +
+            '</span>' +
           '</div>';
+
+        // Make entire card clickable
+        card.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var target = card.getAttribute('data-url');
+          if (target && target !== '#') {
+            window.location.href = target;
+          }
+        });
 
         container.appendChild(card);
       });
     })
     .catch(function(err) {
-      console.error('[loader.js] Failed to load ' + resolvedUrl + ':', err);
+      console.error('[loader.js] Failed to load ' + dataUrl + ':', err);
       container.innerHTML =
         '<div style="text-align:center;padding:3rem;color:var(--error);font-size:0.9rem;">' +
           '<p>\u26A0\uFE0F Failed to load content. Please try again later.</p>' +
@@ -113,19 +98,19 @@ function escapeHtml(text) {
 document.addEventListener('DOMContentLoaded', function() {
 
   if (document.getElementById('guides-grid')) {
-    loadCards({ dataUrl: 'data/guides.json', containerId: 'guides-grid', showAll: true });
+    loadCards({ dataUrl: '/data/guides.json', containerId: 'guides-grid', showAll: true });
   }
 
   if (document.getElementById('blog-grid')) {
-    loadCards({ dataUrl: 'data/blog.json', containerId: 'blog-grid', showAll: true });
+    loadCards({ dataUrl: '/data/blog.json', containerId: 'blog-grid', showAll: true });
   }
 
   if (document.getElementById('home-guides-preview')) {
-    loadCards({ dataUrl: 'data/guides.json', containerId: 'home-guides-preview', limit: 4 });
+    loadCards({ dataUrl: '/data/guides.json', containerId: 'home-guides-preview', limit: 4 });
   }
 
   if (document.getElementById('home-blog-preview')) {
-    loadCards({ dataUrl: 'data/blog.json', containerId: 'home-blog-preview', limit: 4 });
+    loadCards({ dataUrl: '/data/blog.json', containerId: 'home-blog-preview', limit: 4 });
   }
 
 });
